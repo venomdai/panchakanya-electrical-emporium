@@ -339,7 +339,7 @@ const persistedState = (key, fallback) => {
 const defaultSiteContent = {
   phone: '+977-9855-033485',
   whatsapp: '+977-9855-033485',
-  email: 'sales@panchakanya.com.np',
+  email: 'shaan.urs@gmail.com',
   location: 'Tandi, Chitwan, Nepal',
   hours: 'Sun - Fri: 9:00 AM - 7:00 PM',
   about: 'Panchakanya Electric Emporium is a trusted electrical and appliance shop in Tandi, Chitwan. We supply fans, coolers, AC, rice cookers, induction stoves, refrigerators, chandeliers, lights, inverters, batteries, and electrical essentials from trusted brands.',
