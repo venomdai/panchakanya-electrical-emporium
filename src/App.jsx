@@ -1,7 +1,8 @@
 import {
- useEffect, useMemo, useState }
+ useEffect, useMemo, useRef, useState }
  from 'react'
 import './App.css'
+import { supabase, rowToProduct, productToRow, rowToSiteContent, siteContentToRow } from './lib/supabase.js'
 // ============================================================================
 // CONFIGURATION & UTILITIES
 // ============================================================================
@@ -93,10 +94,8 @@ const PRODUCT_CATEGORIES = {
  id: 'socket', name: 'Switch & Socket' }
 ,    ],  }
 ,}
-// Flatten categories for easier access
-const defaultCategoryList = Object.values(PRODUCT_CATEGORIES).map(cat => ({
-  id: cat.id,  name: cat.name,  icon: cat.icon,}
-))
+const asset = (path) => (path && path.startsWith('/') && !path.startsWith('//') ? import.meta.env.BASE_URL.replace(/\/$/, '') + path : path)
+const getProductImage = (product) => asset((product.images && product.images[0]) || '/PPE.jpg')
 // ============================================================================
 // BRANDS
 // ============================================================================
@@ -409,6 +408,8 @@ const [menuOpen, setMenuOpen] = useState(false)
 const [selectedProduct, setSelectedProduct] = useState(null)
   
 const [whatsappConfirm, setWhatsappConfirm] = useState(null)  
+// State - Scroll to top
+const [showScrollTop, setShowScrollTop] = useState(false)  
 // State - Site Content
   
 const [siteContent, setSiteContent] = useState(() => persistedState('panchakanya-content', defaultSiteContent))  
@@ -419,6 +420,59 @@ const [siteContent, setSiteContent] = useState(() => persistedState('panchakanya
   useEffect(() => {
  localStorage.setItem('panchakanya-content', JSON.stringify(siteContent)) }
 , [siteContent])  
+// Sync catalog with Supabase on load
+  const initialProductsRef = useRef(products)
+  const initialSiteContentRef = useRef(siteContent)
+  useEffect(() => {
+    const loadFromSupabase = async () => {
+      try {
+        const { data: rows, error } = await supabase.from('products').select('*').limit(5000)
+        if (error) throw error
+        if (rows && rows.length) {
+          setProducts(rows.map(rowToProduct))
+        } else if (initialProductsRef.current.length) {
+          const { error: upsertError } = await supabase.from('products').upsert(initialProductsRef.current.map(productToRow))
+          if (upsertError) console.warn('Could not seed products to Supabase:', upsertError.message)
+        }
+        const content = await supabase.from('site_content').select('*').eq('id', 'main').maybeSingle()
+        if (content.error) throw content.error
+        if (content.data) {
+          setSiteContent(rowToSiteContent(content.data))
+        } else {
+          const { error: contentUpsertError } = await supabase.from('site_content').upsert(siteContentToRow(initialSiteContentRef.current))
+          if (contentUpsertError) console.warn('Could not seed site content to Supabase:', contentUpsertError.message)
+        }
+      } catch (err) {
+        console.warn('Supabase not reachable, using local catalog:', err.message)
+      }
+    }
+    loadFromSupabase()
+  }, [])
+// Scroll-to-top visibility + modal handling
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedProduct(null)
+        setWhatsappConfirm(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+  useEffect(() => {
+    const locked = !!(selectedProduct || whatsappConfirm)
+    if (locked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [selectedProduct, whatsappConfirm])  
 // ============================================================================
   
 // FILTERING & SORTING LOGIC
@@ -433,7 +487,7 @@ let filtered = products.filter((product) => {
       
 // Search filter
       
-const matchesSearch =        !term ||        product.name.toLowerCase().includes(term) ||        product.brand.toLowerCase().includes(term) ||        product.model.toLowerCase().includes(term) ||        product.category.toLowerCase().includes(term) ||        product.categoryGroup.toLowerCase().includes(term) ||        product.description.toLowerCase().includes(term)      
+const matchesSearch =        !term ||        String(product.name || '').toLowerCase().includes(term) ||        String(product.brand || '').toLowerCase().includes(term) ||        String(product.model || '').toLowerCase().includes(term) ||        String(product.category || '').toLowerCase().includes(term) ||        String(product.categoryGroup || '').toLowerCase().includes(term) ||        String(product.description || '').toLowerCase().includes(term)      
 // Brand filter
       
 const matchesBrand = selectedBrand === 'All' || product.brand === selectedBrand      
@@ -484,7 +538,7 @@ return (    <div className="app-shell">      {
 /* NAVBAR */}
       <header className="navbar">        <div className="navbar-container">          <div className="navbar-brand">            <button className="navbar-toggle" onClick={
 () => setMenuOpen(!menuOpen)}
->☰</button>            <div className="logo">              <img className="logo-icon-img" src="/PPE.jpg" alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>          </div>          <div className={
+>☰</button>            <div className="logo">              <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>          </div>          <div className={
 `navbar-menu ${menuOpen ? 'active' : ''}`
 }
 >            <a href="#home" onClick={
@@ -515,7 +569,9 @@ searchTerm}
 >Explore Products</button>                <a href={
 `https://wa.me/${WHATSAPP_NUMBER}`
 }
- className="btn-secondary" target="_blank" rel="noreferrer">📱 Chat on WhatsApp</a>              </div>            </div>            <div className="hero-collage">              <div className="collage-grid">                <div className="collage-item collage-card-1">                  <img src="/AC.png" alt="AC" />                  <span className="collage-badge">❄️ Air Conditioner</span>                </div>                <div className="collage-item collage-card-2">                  <img src="/Cooler.png" alt="Air Cooler" />                  <span className="collage-badge">💨 Air Cooler</span>                </div>                <div className="collage-item collage-card-3">                  <img src="/Fan.jpg" alt="Fans" />                  <span className="collage-badge">🌀 Fans</span>                </div>                <div className="collage-item collage-card-4">                  <img src="/Lights.jpg" alt="Lights" />                  <span className="collage-badge">💡 Lights</span>                </div>              </div>            </div>          </div>        </section>        {
+ className="btn-secondary" target="_blank" rel="noreferrer">📱 Chat on WhatsApp</a>              </div>            </div>            <div className="hero-collage">              <div className="collage-grid">                <div className="collage-item collage-card-1">                  <img src={asset('/AC.png')} alt="AC" />                  <span className="collage-badge">❄️ Air Conditioner</span>                </div>                <div className="collage-item collage-card-2">                  <img src={asset('/Cooler.png')} alt="Air Cooler" />                  <span className="collage-badge">💨 Air Cooler</span>                </div>                <div className="collage-item collage-card-3">                  <img src={asset('/Fan.jpg')} alt="Fans" />                  <span className="collage-badge">🌀 Fans</span>                </div>                <div className="collage-item collage-card-4">                  <img src={asset('/Lights.jpg')} alt="Lights" />                  <span className="collage-badge">💡 Lights</span>                </div>              </div>            </div>          </div>        </section>        {
+/* TRUST STRIP */}
+        <section className="trust-strip">          <div className="container trust-grid">            <div className="trust-item">              <span className="trust-icon">✅</span>              <div>                <strong>Genuine Brands</strong>                <small>Trusted, original products</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">🚚</span>              <div>                <strong>Fast Delivery</strong>                <small>Across Chitwan</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">🛠️</span>              <div>                <strong>Installation Support</strong>                <small>Free guidance at the store</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">💬</span>              <div>                <strong>WhatsApp Support</strong>                <small>Instant replies</small>              </div>            </div>          </div>        </section>        {
 /* SHOP BY CATEGORY SECTION */}
         <section id="categories" className="shop-by-category">          <div className="container">            <div className="section-header">              <h2>Everything Your Home Needs</h2>              <p>Browse our comprehensive collection by category</p>            </div>            <div className="category-showcase-grid">              <div className="category-showcase-card">                <div className="category-showcase-icon">🍳</div>                <h3>Kitchen Appliances</h3>                <ul>                  <li>Kitchen Chimney</li>                  <li>Rice Cooker</li>                  <li>Induction Cooktops</li>                </ul>                <button className="category-showcase-btn" onClick={
 () => {
@@ -563,8 +619,7 @@ brand.id}
                   title={
 `Filter by ${brand.name}`
 }
-                >                  <img src={
-brand.logo}
+                >                  <img src={asset(brand.logo)}
  alt={
 brand.name}
  className="brand-logo-image" />                  <span className="brand-name">{
@@ -586,7 +641,7 @@ brand.name}
 featuredProducts.map((product) => (                <div key={
 product.id}
  className="product-card">                  <div className="product-image">                    <img src={
-product.images[0]}
+getProductImage(product)}
  alt={
 product.name}
  />                    {
@@ -603,10 +658,12 @@ product.name}
 product.model && <p className="product-model">Model: {
 product.model}
 </p>}
-                    <div className="product-rating">                      {
-'★'.repeat(Math.floor(product.rating))}
+                    <span className="product-category">{
+product.category}
+</span>                    <div className="product-rating">                      {
+'★'.repeat(Math.floor(product.rating || 0))}
  ({
-product.reviewCount}
+product.reviewCount || 0}
 )                    </div>                    <div className="product-price">                      <span className="price">{
 formatNPR(product.price)}
 </span>                      {
@@ -697,7 +754,7 @@ resetFilters}
 filteredProducts.map((product) => (                  <div key={
 product.id}
  className="product-card">                    <div className="product-image">                      <img src={
-product.images[0]}
+getProductImage(product)}
  alt={
 product.name}
  />                      {
@@ -714,10 +771,12 @@ product.name}
 product.model && <p className="product-model">Model: {
 product.model}
 </p>}
-                      <div className="product-rating">                        {
-'★'.repeat(Math.floor(product.rating))}
+                      <span className="product-category">{
+product.category}
+</span>                      <div className="product-rating">                        {
+'★'.repeat(Math.floor(product.rating || 0))}
  ({
-product.reviewCount}
+product.reviewCount || 0}
 )                      </div>                      <div className="product-price">                        <span className="price">{
 formatNPR(product.price)}
 </span>                        {
@@ -730,26 +789,13 @@ formatNPR(product.originalPrice)}
 () => setWhatsappConfirm(product)}
 >📱 Inquire</button>                      </div>                    </div>                  </div>                ))}
               </div>            )}
-          </div>        </section>        {
-/* CONTACT SECTION */}
-        <section id="contact" className="contact-section">          <div className="container">            <div className="contact-content">              <div className="contact-info">                <h2>Get in Touch</h2>                <p>Questions about our products? Contact us today!</p>                <div className="contact-details">                  <div className="contact-item">                    <span>📍</span>                    <div>                      <strong>Location</strong>                      <p>{
-siteContent.location}
-</p>                    </div>                  </div>                  <div className="contact-item">                    <span>📞</span>                    <div>                      <strong>Phone</strong>                      <a href={
-`tel:${siteContent.phone}`
-}
->{
-siteContent.phone}
-</a>                    </div>                  </div>                  <div className="contact-item">                    <span>📧</span>                    <div>                      <strong>Email</strong>                      <a href={
-`mailto:${siteContent.email}`
-}
->{
-siteContent.email}
-</a>                    </div>                  </div>                  <div className="contact-item">                    <span>🕐</span>                    <div>                      <strong>Hours</strong>                      <p>{
-siteContent.hours}
-</p>                    </div>                  </div>                </div>              </div>              <div className="contact-cta">                <h3>WhatsApp Support</h3>                <p>Get instant replies and product information on WhatsApp.</p>                <a href={
-`https://wa.me/${WHATSAPP_NUMBER}`
-}
- className="btn-primary" target="_blank" rel="noreferrer">                  💬 Open WhatsApp Chat                </a>              </div>            </div>          </div>        </section>      </main>      {
+          </div>        </section>      </main>      {
+/* FOOTER */}
+      <footer className="site-footer" id="contact">        <div className="container footer-grid">          <div className="footer-col footer-about">            <div className="logo">              <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>            <p>Your trusted electrical &amp; appliance shop in Tandi, Chitwan. Quality products, fair prices and dependable after-sales support.</p>          </div>          <div className="footer-col">            <h4>Quick Links</h4>            <ul>              <li><a href="#home">Home</a></li>              <li><a href="#brands">Brands</a></li>              <li><a href="#categories">Products</a></li>              <li><a href="#shop">Shop</a></li>              <li><a href="#contact">Contact</a></li>            </ul>          </div>          <div className="footer-col">            <h4>Popular Categories</h4>            <ul>              <li><a href="#shop" onClick={ () => setSelectedCategory('Air Conditioner') }>Air Conditioners</a></li>              <li><a href="#shop" onClick={ () => setSelectedCategory('Fans') }>Fans</a></li>              <li><a href="#shop" onClick={ () => setSelectedCategory('Kitchen Appliances') }>Kitchen Appliances</a></li>              <li><a href="#shop" onClick={ () => setSelectedCategory('Lighting & Decor') }>Lighting</a></li>              <li><a href="#shop" onClick={ () => setSelectedCategory('Electrical & Power') }>Electrical &amp; Power</a></li>            </ul>          </div>          <div className="footer-col">            <h4>Contact</h4>            <ul className="footer-contact">              <li>📍 {siteContent.location}</li>              <li>📞 <a href={ `tel:${siteContent.phone}` }>{siteContent.phone}</a></li>              <li>📧 <a href={ `mailto:${siteContent.email}` }>{siteContent.email}</a></li>              <li>🕐 {siteContent.hours}</li>            </ul>          </div>        </div>        <div className="footer-bottom">          <span>© {new Date().getFullYear()} Panchakanya Electric Emporium. All rights reserved.</span>        </div>      </footer>      {
+/* SCROLL TO TOP */}
+      {
+showScrollTop && (        <button className="scroll-top" onClick={ () => window.scrollTo({ top: 0, behavior: 'smooth' }) } aria-label="Back to top">↑</button>      )}
+      {
 /* PRODUCT DETAIL MODAL */}
       {
 selectedProduct && (        <div className="modal-overlay" onClick={
@@ -759,7 +805,7 @@ selectedProduct && (        <div className="modal-overlay" onClick={
 >            <button className="modal-close" onClick={
 () => setSelectedProduct(null)}
 >✕</button>            <div className="modal-body">              <div className="modal-image">                <img src={
-selectedProduct.images[0]}
+getProductImage(selectedProduct)}
  alt={
 selectedProduct.name}
  />              </div>              <div className="modal-info">                <span className="product-brand">{
@@ -771,9 +817,9 @@ selectedProduct.model && <p className="product-model">Model: {
 selectedProduct.model}
 </p>}
                 <div className="product-rating">                  {
-'★'.repeat(Math.floor(selectedProduct.rating))}
+'★'.repeat(Math.floor(selectedProduct.rating || 0))}
  ({
-selectedProduct.reviewCount}
+selectedProduct.reviewCount || 0}
  reviews)                </div>                <div className="product-price">                  <span className="price">{
 formatNPR(selectedProduct.price)}
 </span>                  {
@@ -783,7 +829,7 @@ formatNPR(selectedProduct.originalPrice)}
                 </div>                <p className="product-description">{
 selectedProduct.description}
 </p>                <div className="product-specs">                  <h4>Specifications</h4>                  <ul>                    {
-Object.entries(selectedProduct.specs).map(([key, value]) => (                      <li key={
+Object.entries(selectedProduct.specs || {}).map(([key, value]) => (                      <li key={
 key}
 ><strong>{
 key}
@@ -791,7 +837,7 @@ key}
 value}
 </li>                    ))}
                   </ul>                </div>                <div className="product-features">                  <h4>Features</h4>                  <ul>                    {
-selectedProduct.features.map((feature, idx) => (                      <li key={
+(selectedProduct.features || []).map((feature, idx) => (                      <li key={
 idx}
 >✓ {
 feature}
@@ -828,5 +874,6 @@ formatNPR(whatsappConfirm.price)}
                 >                  Continue to WhatsApp                </button>                <button                   className="btn-secondary"                   onClick={
 () => setWhatsappConfirm(null)}
                 >                  Cancel                </button>              </div>            </div>          </div>        </div>      )}
+      <a href={asset('/item.html')} className="admin-link" title="Manage products (owner)">⚙️ Manage</a>
     </div>  )}
 export default App
