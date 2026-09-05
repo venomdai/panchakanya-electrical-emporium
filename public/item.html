@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item Manager - Panchakanya Electric Emporium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary:#2563eb; --primary-dark:#1d4ed8; --primary-700:#1e40af;
+    --accent:#f97316; --whats:#25d366; --success:#16a34a; --danger:#dc2626;
+    --surface:#fff; --bg:#f6f8fb; --text:#0f172a; --muted:#5f6f85; --border:#e5eaf2;
+    --navy:#0b1f3d; --shadow-sm:0 2px 6px rgba(15,23,42,.06);
+    --shadow:0 6px 18px rgba(15,23,42,.08); --shadow-md:0 12px 30px rgba(15,23,42,.12);
+    --shadow-lg:0 20px 48px rgba(15,23,42,.18); --radius:16px; --radius-sm:10px;
+  }
+  body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  button { font-family:inherit; cursor:pointer; }
+  a { color:var(--primary); text-decoration:none; }
+  img { max-width:100%; display:block; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:linear-gradient(135deg,#1e3a8a,#0b1f3d); color:#fff; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; box-shadow:var(--shadow-md); }
+  .topbar h1 { font-size:19px; font-weight:800; }
+  .topbar h1 small { display:block; font-size:12px; font-weight:400; opacity:.8; }
+  .topbar-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+  .btn { border:none; border-radius:10px; padding:9px 15px; font-size:13px; font-weight:700; transition:transform .15s ease, box-shadow .2s ease, filter .2s ease, background .2s ease; }
+  .btn:active { transform:scale(.96); }
+  .btn-primary { background:var(--success); color:#fff; }
+  .btn-primary:hover { filter:brightness(1.08); transform:translateY(-1px); box-shadow:0 6px 16px rgba(22,163,74,.4); }
+  .btn-blue { background:var(--primary); color:#fff; }
+  .btn-blue:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.4); }
+  .btn-ghost { background:rgba(255,255,255,.16); color:#fff; }
+  .btn-ghost:hover { background:rgba(255,255,255,.28); }
+  .btn-outline { background:#fff; color:var(--primary); border:1px solid var(--primary); }
+  .btn-outline:hover { background:#eff6ff; }
+  .btn-danger { background:var(--danger); color:#fff; }
+  .btn-danger:hover { filter:brightness(1.08); }
+  .btn-sm { padding:6px 11px; font-size:12px; border-radius:8px; }
+
+  .wrap { max-width:1220px; margin:0 auto; padding:20px 16px 70px; }
+
+  .tabs { display:flex; gap:8px; margin-bottom:16px; }
+  .tab { padding:9px 18px; border-radius:999px; border:1px solid var(--border); background:#fff; font-weight:700; font-size:.9rem; color:var(--muted); transition:all .2s ease; }
+  .tab.active { background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 6px 14px rgba(37,99,235,.3); }
+  .tab:hover:not(.active) { border-color:var(--primary); color:var(--primary); }
+
+  .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+  .toolbar input[type="search"], .toolbar select { padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:13px; background:#fff; }
+  .toolbar input[type="search"] { flex:1; min-width:180px; }
+  .toolbar input:focus, .toolbar select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+  .stats { margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap; }
+  .usage { height:5px; background:#e3e9f1; border-radius:3px; overflow:hidden; margin-top:5px; }
+  .usage div { height:100%; background:linear-gradient(90deg,var(--success),#7dd88b); width:0%; }
+  .usage.warn div { background:#e0862f; }
+
+  .hint { background:#eff6ff; border:1px solid #c7ddfc; color:#1e3a8a; border-radius:12px; padding:13px 16px; font-size:13px; margin-bottom:16px; line-height:1.6; }
+  .hint code { background:#fff; padding:1px 6px; border-radius:5px; font-size:12px; }
+
+  /* ---------- Catalog preview cards ---------- */
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:22px; }
+  .pc { background:var(--surface); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); border:1px solid var(--border); display:flex; flex-direction:column; transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .pc:hover { transform:translateY(-8px); box-shadow:var(--shadow-lg); border-color:#d3e5ff; }
+  .pc-img { position:relative; height:200px; overflow:hidden; background:linear-gradient(160deg,#f6f8fb,#eef2f8); }
+  .pc-img img { width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
+  .pc:hover .pc-img img { transform:scale(1.08); }
+  .pc-badge { position:absolute; top:10px; right:10px; background:var(--danger); color:#fff; padding:4px 10px; border-radius:999px; font-size:.75rem; font-weight:800; }
+  .pc-badge.new { left:10px; right:auto; background:var(--success); }
+  .pc-body { padding:16px; display:flex; flex-direction:column; flex:1; }
+  .pc-brand { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:5px; }
+  .pc-cat { align-self:flex-start; font-size:.7rem; font-weight:700; color:#c2410c; background:#fff3e6; border:1px solid #ffd9b3; padding:2px 9px; border-radius:999px; margin-bottom:8px; }
+  .pc-name { font-size:1rem; font-weight:700; line-height:1.35; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .pc-model { font-size:.82rem; color:var(--muted); margin-bottom:10px; }
+  .pc-price { display:flex; align-items:baseline; gap:8px; margin-bottom:14px; }
+  .pc-price .p { font-size:1.22rem; font-weight:800; color:var(--primary-700); }
+  .pc-price .o { font-size:.86rem; color:var(--muted); text-decoration:line-through; }
+  .pc-btns { display:flex; gap:8px; margin-top:auto; }
+  .pc-btns a, .pc-btns button { flex:1; border:none; border-radius:10px; padding:10px 8px; font-size:.86rem; font-weight:700; text-align:center; transition:all .22s ease; }
+  .pc-edit { background:#eff6ff; color:var(--primary-700); border:1px solid #d3e5ff !important; }
+  .pc-edit:hover { background:var(--primary); color:#fff; transform:translateY(-2px); }
+  .pc-wa { background:var(--whats); color:#fff; }
+  .pc-wa:hover { background:#1fbd59; transform:translateY(-2px); box-shadow:0 6px 14px rgba(37,211,102,.35); }
+  .empty { text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty .big { font-size:38px; margin-bottom:10px; }
+
+  /* ---------- Manage table ---------- */
+  .table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { text-align:left; padding:12px; background:#eef2f8; color:var(--muted); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody td { padding:11px 12px; border-bottom:1px solid #eef1f6; vertical-align:middle; }
+  tbody tr:hover { background:#f7faff; }
+  .thumb { width:46px; height:46px; border-radius:10px; object-fit:cover; background:#eef1f6; border:1px solid var(--border); }
+  .thumb.placeholder { display:flex; align-items:center; justify-content:center; color:#aab4c2; font-size:18px; }
+  .name-cell strong { display:block; font-size:13px; }
+  .name-cell span { color:var(--muted); font-size:11px; }
+  .badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:10px; font-weight:800; margin:1px 2px; }
+  .badge.out { background:#fde8e8; color:#b81d1d; }
+  .badge.in { background:#e4f6e7; color:#118a27; }
+  .badge.new { background:#ffe9c7; color:#a35a00; }
+  .badge.feat { background:#e3edff; color:var(--primary); }
+  .actions { white-space:nowrap; }
+
+  /* ---------- Form modal ---------- */
+  .overlay { position:fixed; inset:0; background:rgba(11,31,61,.55); backdrop-filter:blur(5px); display:none; align-items:flex-start; justify-content:center; padding:28px 14px; overflow-y:auto; z-index:80; }
+  .overlay.open { display:flex; animation:fadeIn .2s ease; }
+  .modal { background:#fff; border-radius:16px; width:100%; max-width:740px; overflow:hidden; box-shadow:var(--shadow-lg); animation:popIn .28s cubic-bezier(.34,1.56,.64,1); }
+  .modal-head { background:linear-gradient(135deg,#1e3a8a,#2563eb); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; }
+  .modal-head h2 { font-size:16px; font-weight:800; }
+  .modal-close { background:none; border:none; color:#fff; font-size:22px; cursor:pointer; line-height:1; }
+  .modal-body { padding:18px; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-grid .full { grid-column:1 / -1; }
+  label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  input[type="text"], input[type="number"], input[type="search"], textarea, select { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:inherit; background:#fff; }
+  input:focus, textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+  textarea { resize:vertical; min-height:58px; }
+  .checks { display:flex; gap:14px; flex-wrap:wrap; }
+  .checks label { display:flex; align-items:center; gap:6px; font-weight:600; color:var(--text); font-size:13px; margin:0; }
+  .checks input { width:auto; }
+  .spec-row { display:flex; gap:8px; margin-bottom:7px; }
+  .spec-row input:first-child { flex:0 0 38%; }
+  .icon-btn { border:1px solid var(--border); background:#fff; border-radius:8px; width:34px; height:34px; cursor:pointer; font-size:14px; color:var(--danger); flex-shrink:0; }
+  .icon-btn:hover { background:#fdecec; border-color:#e8b6b6; }
+  .add-spec { color:var(--primary); background:#eff6ff; border:1px dashed var(--primary); border-radius:8px; padding:7px 13px; font-size:12px; font-weight:700; cursor:pointer; }
+  .add-spec:hover { background:#e0edff; }
+  .photos { display:flex; flex-wrap:wrap; gap:10px; }
+  .photo { position:relative; width:84px; height:84px; }
+  .photo img { width:100%; height:100%; object-fit:cover; border-radius:9px; border:1px solid var(--border); }
+  .photo button { position:absolute; top:-7px; right:-7px; width:21px; height:21px; border-radius:50%; border:2px solid #fff; background:var(--danger); color:#fff; font-size:11px; cursor:pointer; line-height:1; }
+  .drop { border:2px dashed var(--border); border-radius:9px; width:84px; height:84px; display:flex; align-items:center; justify-content:center; color:#aab4c2; font-size:11px; text-align:center; cursor:pointer; background:#fafcff; }
+  .drop:hover { border-color:var(--primary); color:var(--primary); }
+  .modal-foot { display:flex; gap:10px; justify-content:flex-end; padding:14px 18px; border-top:1px solid #eef1f6; background:#fafcff; }
+
+  .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(90px); background:#0b1f3d; color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; font-weight:700; opacity:0; transition:all .25s ease; z-index:99; box-shadow:var(--shadow-lg); }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.ok { background:var(--success); }
+  .toast.err { background:var(--danger); }
+
+  /* ---------- Login gate ---------- */
+  .login-gate { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:18px; background:linear-gradient(135deg,#0b1f3d,#1e3a8a); }
+  .login-gate.hidden { display:none; }
+  .login-card { width:100%; max-width:400px; background:#fff; border-radius:20px; padding:30px 28px; box-shadow:var(--shadow-lg); text-align:center; animation:popIn .3s cubic-bezier(.34,1.56,.64,1); }
+  .login-logo { width:64px; height:64px; margin:0 auto 12px; border-radius:18px; background:linear-gradient(135deg,var(--primary),#1e3a8a); display:flex; align-items:center; justify-content:center; font-size:30px; box-shadow:0 10px 24px rgba(37,99,235,.35); }
+  .login-card h2 { font-size:20px; font-weight:800; margin-bottom:4px; }
+  .login-card p { font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .login-card input { width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:11px; font-size:14px; margin-bottom:11px; font-family:inherit; background:#fff; }
+  .login-card input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+  .login-error { color:var(--danger); font-size:12.5px; font-weight:700; margin:-4px 0 10px; display:none; }
+  .login-btn { width:100%; padding:12px; border:none; border-radius:11px; background:linear-gradient(135deg,var(--primary),#1e3a8a); color:#fff; font-size:14px; font-weight:800; cursor:pointer; transition:all .2s ease; font-family:inherit; }
+  .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(37,99,235,.4); }
+  .login-btn:active { transform:scale(.98); }
+  .login-note { margin-top:14px; font-size:11.5px; color:#aab4c2; }
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes popIn { from{opacity:0;transform:scale(.92) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+  @media (max-width:760px) {
+    .form-grid { grid-template-columns:1fr; }
+    .stats { width:100%; margin-left:0; }
+    .cards-grid { grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; }
+    .pc-img { height:160px; }
+    thead th:nth-child(4), thead th:nth-child(5), tbody td:nth-child(4), tbody td:nth-child(5) { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-gate" id="loginGate">
+  <form class="login-card" onsubmit="return doLogin(event)">
+    <div class="login-logo">🔐</div>
+    <h2>Item Manager Login</h2>
+    <p>Restricted area — only the shop admin can manage products.</p>
+    <input type="text" id="lg-user" placeholder="Username" autocomplete="username" autofocus>
+    <input type="password" id="lg-pass" placeholder="Password" autocomplete="current-password">
+    <div class="login-error" id="lg-error">Incorrect username or password.</div>
+    <button class="login-btn" type="submit">Sign In</button>
+    <div class="login-note">Access is limited to authorized staff.</div>
+  </form>
+</div>
+
+<div class="topbar">
+  <h1>📦 Item Manager <small>Panchakanya Electric Emporium</small></h1>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" onclick="logout()">🔒 Logout</button>
+    <button class="btn btn-primary" onclick="openForm()">＋ Add Item</button>
+    <button class="btn btn-ghost" onclick="exportJson()">⬇ Export</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importJson(event)">
+    <a class="btn btn-blue" href="./" onclick="return confirm('Open the main website? Unsaved modal changes will be lost.');">🏪 View Site</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" id="tabCards" onclick="setView('cards')">🖼 Catalog</button>
+    <button class="tab" id="tabTable" onclick="setView('table')">🗂 Manage List</button>
+  </div>
+
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="🔍  Search name, brand, model, category..." oninput="render()">
+    <select id="catFilter" onchange="render()"><option value="">All categories</option></select>
+    <select id="brandFilter" onchange="render()"><option value="">All brands</option></select>
+    <select id="sortBy" onchange="render()">
+      <option value="featured">Sort: Featured</option>
+      <option value="alpha">Name A–Z</option>
+      <option value="low">Price: Low → High</option>
+      <option value="high">Price: High → Low</option>
+    </select>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="hint" id="loadHint" style="display:none">
+    No product data found in this browser yet. Open the main website <b>once</b> (on this device) so it loads the default catalog, then come back here. Or use <b>Import</b> to restore a backup JSON file.
+  </div>
+
+  <!-- Catalog preview view -->
+  <div id="viewCards">
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+
+  <!-- Manage table view -->
+  <div id="viewTable" style="display:none">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px">Photo</th>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th style="width:120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Product form modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="formTitle">Add Item</h2>
+      <button class="modal-close" onclick="closeForm()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <label class="full">Item Name *
+          <input type="text" id="f-name" placeholder="e.g. Samsung 43&quot; Smart TV">
+        </label>
+        <label>Brand
+          <input type="text" id="f-brand" list="dl-brand" placeholder="e.g. Samsung">
+          <datalist id="dl-brand"></datalist>
+        </label>
+        <label>Category *
+          <input type="text" id="f-category" list="dl-cat" placeholder="e.g. Television">
+          <datalist id="dl-cat"></datalist>
+        </label>
+        <label>Category Group
+          <input type="text" id="f-catgroup" list="dl-catgroup" placeholder="e.g. Home Appliances">
+          <datalist id="dl-catgroup"></datalist>
+        </label>
+        <label>Model
+          <input type="text" id="f-model" placeholder="e.g. UA43T">
+        </label>
+        <label>Price (NPR) *
+          <input type="number" id="f-price" min="0" step="1" placeholder="e.g. 63999">
+        </label>
+        <label>Original Price (NPR)
+          <input type="number" id="f-oprice" min="0" step="1" placeholder="for discount">
+        </label>
+        <label>Stock
+          <input type="number" id="f-stock" min="0" step="1" placeholder="0">
+        </label>
+        <label>Rating (0–5)
+          <input type="number" id="f-rating" min="0" max="5" step="0.1" placeholder="4.5">
+        </label>
+        <label>Review Count
+          <input type="number" id="f-reviews" min="0" step="1" placeholder="0">
+        </label>
+        <div class="full checks">
+          <label><input type="checkbox" id="f-instock" checked> In stock</label>
+          <label><input type="checkbox" id="f-new"> New arrival</label>
+          <label><input type="checkbox" id="f-featured"> Featured</label>
+          <label><input type="checkbox" id="f-bestseller"> Best seller</label>
+        </div>
+        <div class="full">
+          <label>Photos <span style="font-weight:400">(click to add, max 4 — auto-compressed)</span></label>
+          <div class="photos" id="f-photos"></div>
+          <input type="file" id="f-file" accept="image/*" multiple style="display:none" onchange="addFiles(event)">
+        </div>
+        <label class="full">Description
+          <textarea id="f-desc" placeholder="Short description shown to customers"></textarea>
+        </label>
+        <label class="full">Features <span style="font-weight:400">(one per line)</span>
+          <textarea id="f-features" placeholder="4K UHD display&#10;Smart TV platform"></textarea>
+        </label>
+        <label class="full">Specifications
+          <div class="specs-rows" id="specsRows"></div>
+          <button type="button" class="add-spec" onclick="addSpecRow()">＋ Add specification</button>
+        </label>
+        <label class="full">Warranty
+          <input type="text" id="f-warranty" placeholder="e.g. 1 Year Manufacturer Warranty">
+        </label>
+        <label class="full">Delivery Info
+          <input type="text" id="f-delivery" placeholder="e.g. Free delivery within Tandi and nearby areas.">
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="formDeleteBtn" style="display:none; margin-right:auto" onclick="deleteCurrent()">🗑 Delete</button>
+      <button class="btn btn-outline" onclick="closeForm()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveForm()">💾 Save Item</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+'use strict'
+
+const STORAGE_KEY = 'panchakanya-products-v8'
+const WHATSAPP = '9855033485'
+
+const SUPABASE_URL = 'https://fdcqcxmwzpkffpqobyep.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_OKE0fOg2z2d24DskVnTcVA_Z2ilC3mm'
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null
+
+function rowToProduct(r) {
+  return {
+    id: r.id, name: r.name, brand: r.brand, category: r.category,
+    categoryGroup: r.category_group, model: r.model, price: Number(r.price),
+    originalPrice: Number(r.original_price), stock: r.stock, rating: Number(r.rating),
+    reviewCount: r.review_count, inStock: r.in_stock, newArrival: r.new_arrival,
+    featured: r.featured, bestSeller: r.best_seller,
+    images: r.images || [], description: r.description,
+    features: r.features || [], specs: r.specs || {},
+    warranty: r.warranty, delivery: r.delivery
+  }
+}
+
+function productToRow(p) {
+  return {
+    id: p.id, name: p.name, brand: p.brand, category: p.category,
+    category_group: p.categoryGroup, model: p.model, price: p.price,
+    original_price: p.originalPrice, stock: p.stock, rating: p.rating,
+    review_count: p.reviewCount, in_stock: p.inStock, new_arrival: p.newArrival,
+    featured: p.featured, best_seller: p.bestSeller,
+    images: p.images || [], description: p.description,
+    features: p.features || [], specs: p.specs || {},
+    warranty: p.warranty, delivery: p.delivery
+  }
+}
+
+// ---------------------------------------------------------------- auth gate
+// Login wall so customers can't see or edit the product manager.
+// Credentials are stored as SHA-256 hashes (never plaintext).
+const AUTH = {
+  userHash: '97a0fc6b1231a84c72a734bdfa90256a283816416f348c1c928ea35c15999aa7',
+  passHash: 'e3646355f252d36deb79839f9a9271043925b68a6eb9d6e7f8f9210c5688b6d0'
+}
+const AUTH_KEY = 'panchakanya-admin'
+function loginOk() { return sessionStorage.getItem(AUTH_KEY) === '1' }
+function doLogin(e) {
+  e.preventDefault()
+  const u = document.getElementById('lg-user').value.trim()
+  const p = document.getElementById('lg-pass').value
+  if (!u || !p) return
+  if (sha256Str(u) === AUTH.userHash && sha256Str(p) === AUTH.passHash) {
+    sessionStorage.setItem(AUTH_KEY, '1')
+    document.getElementById('loginGate').classList.add('hidden')
+  } else {
+    document.getElementById('lg-error').style.display = 'block'
+    document.getElementById('lg-pass').value = ''
+    document.getElementById('lg-pass').focus()
+  }
+}
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY)
+  document.getElementById('lg-pass').value = ''
+  document.getElementById('lg-error').style.display = 'none'
+  document.getElementById('loginGate').classList.remove('hidden')
+  document.getElementById('lg-user').focus()
+}
+function sha256Str(text) {
+  return sha256(encodeURIComponent(text || '').replace(/%([0-9A-F]{2})/g, (m, p) => String.fromCharCode(parseInt(p, 16))))
+}
+function sha256(ascii) {
+  const rightRotate = (value, amount) => (value >>> amount) | (value << (32 - amount))
+  const mathPow = Math.pow
+  const maxWord = mathPow(2, 32)
+  let result = ''
+  const words = []
+  const asciiBitLength = ascii.length * 8
+  let hash = sha256.h = sha256.h || []
+  const k = sha256.k = sha256.k || []
+  let primeCounter = k.length
+  const isComposite = {}
+  for (let candidate = 2; primeCounter < 64; candidate++) {
+    if (!isComposite[candidate]) {
+      for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate
+      hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0
+      k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0
+    }
+  }
+  ascii += '\x80'
+  while (ascii.length % 64 - 56) ascii += '\x00'
+  for (let i = 0; i < ascii.length; i++) {
+    const j = ascii.charCodeAt(i)
+    if (j >> 8) return ''
+    words[i >> 2] |= j << ((3 - i) % 4) * 8
+  }
+  words[words.length] = ((asciiBitLength / maxWord) | 0)
+  words[words.length] = asciiBitLength
+  for (let j = 0; j < words.length;) {
+    const w = words.slice(j, j += 16)
+    const oldHash = hash.slice(0)
+    hash = hash.slice(0, 8)
+    for (let i = 0; i < 64; i++) {
+      const w15 = w[i - 15], w2 = w[i - 2]
+      const a = hash[0], e = hash[4]
+      const temp1 = hash[7]
+        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+        + ((e & hash[5]) ^ ((~e) & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (
+          w[i - 16]
+          + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+          + w[i - 7]
+          + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+        ) | 0)
+      const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]))
+      hash = [(temp1 + temp2) | 0].concat(hash)
+      hash[4] = (hash[4] + temp1) | 0
+    }
+    for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0
+  }
+  for (let i = 0; i < 8; i++) {
+    for (let j = 3; j + 1; j--) {
+      const b = (hash[i] >> (j * 8)) & 255
+      result += ((b < 16) ? 0 : '') + b.toString(16)
+    }
+  }
+  return result
+}
+
+let products = []
+let editingId = null
+let photoData = []
+let currentView = 'cards'
+
+// ---------------------------------------------------------------- load / save
+function loadProducts() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    products = raw ? JSON.parse(raw) : []
+  } catch (e) { products = [] }
+  if (!Array.isArray(products)) products = []
+  document.getElementById('loadHint').style.display = products.length ? 'none' : 'block'
+}
+
+function saveProducts() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+  updateStats()
+}
+
+async function dbLoad() {
+  if (!supabaseClient) return
+  try {
+    const { data, error } = await supabaseClient.from('products').select('*').limit(5000)
+    if (error) throw error
+    if (data && data.length) {
+      products = data.map(rowToProduct)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+      updateStats()
+      render()
+      document.getElementById('loadHint').style.display = 'none'
+    } else if (products.length) {
+      const { error: insErr } = await supabaseClient.from('products').upsert(products.map(productToRow))
+      if (insErr) throw insErr
+    }
+  } catch (err) {
+    console.warn('Supabase not reachable, using local catalog:', err.message)
+  }
+}
+
+function dbUpsert(p) {
+  return supabaseClient.from('products').upsert(productToRow(p), { onConflict: 'id' })
+}
+
+function dbDelete(id) {
+  return supabaseClient.from('products').delete().eq('id', id)
+}
+
+function updateStats() {
+  const size = new Blob([JSON.stringify(products)]).size
+  const pct = Math.min(100, (size / (4.5 * 1024 * 1024)) * 100)
+  document.getElementById('stats').innerHTML =
+    products.length + ' items · ' + (size / 1024).toFixed(0) + ' KB' +
+    '<div class="usage' + (pct > 80 ? ' warn' : '') + '"><div style="width:' + pct + '%"></div></div>'
+}
+
+function toast(msg, type) {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = 'toast show ' + (type || '')
+  clearTimeout(el._t)
+  el._t = setTimeout(() => el.className = 'toast', 2200)
+}
+
+function newId() {
+  return 'prod-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7)
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+function escA(s) {
+  return esc(s).replace(/"/g,'&quot;')
+}
+function escId(id) {
+  return String(id).replace(/[^a-zA-Z0-9_-]/g,'')
+}
+function fmt(n) {
+  return 'NPR ' + Number(n || 0).toLocaleString('en-US')
+}
+function waLink(p) {
+  const msg = encodeURIComponent(
+    'Hello, I am interested in the ' + (p.name || 'product') +
+    ((p.model) ? ', Model ' + p.model : '') +
+    '. The listed price is NPR ' + Number(p.price || 0).toLocaleString('en-US') +
+    '. Could you please provide more details and confirm the price?')
+  return 'https://wa.me/' + WHATSAPP + '?text=' + msg
+}
+
+function setView(v) {
+  currentView = v
+  document.getElementById('tabCards').className = 'tab' + (v === 'cards' ? ' active' : '')
+  document.getElementById('tabTable').className = 'tab' + (v === 'table' ? ' active' : '')
+  document.getElementById('viewCards').style.display = v === 'cards' ? '' : 'none'
+  document.getElementById('viewTable').style.display = v === 'table' ? '' : 'none'
+  render()
+}
+
+// ---------------------------------------------------------------- render
+function render() {
+  const term = (document.getElementById('search').value || '').toLowerCase().trim()
+  const cat = document.getElementById('catFilter').value
+  const brand = document.getElementById('brandFilter').value
+  const sort = document.getElementById('sortBy').value
+
+  // populate filter dropdowns
+  const cats = new Set(), brands = new Set(), groups = new Set()
+  products.forEach(p => { if (p.category) cats.add(p.category); if (p.categoryGroup) groups.add(p.categoryGroup); if (p.brand) brands.add(p.brand) })
+
+  let catOpts = '<option value="">All categories</option>'
+  ;[...cats].sort().forEach(c => catOpts += '<option value="' + escA(c) + '"' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>')
+  ;[...groups].sort().forEach(g => catOpts += '<option value="' + escA(g) + '"' + (g === cat ? ' selected' : '') + '>' + esc(g) + '</option>')
+  document.getElementById('catFilter').innerHTML = catOpts
+
+  let brandOpts = '<option value="">All brands</option>'
+  ;[...brands].sort().forEach(b => brandOpts += '<option value="' + escA(b) + '"' + (b === brand ? ' selected' : '') + '>' + esc(b) + '</option>')
+  document.getElementById('brandFilter').innerHTML = brandOpts
+
+  const dlB = document.getElementById('dl-brand'), dlC = document.getElementById('dl-cat'), dlG = document.getElementById('dl-catgroup')
+  const opts = (s) => [...s].map(x => '<option value="' + escA(x) + '"></option>').join('')
+  dlB.innerHTML = opts(brands); dlC.innerHTML = opts(cats); dlG.innerHTML = opts(groups)
+
+  let rows = products.filter(p =>
+    (!cat || p.category === cat || p.categoryGroup === cat) &&
+    (!brand || p.brand === brand) &&
+    (!term || (p.name + ' ' + (p.brand||'') + ' ' + (p.model||'') + ' ' + (p.category||'') + ' ' + (p.categoryGroup||'')).toLowerCase().includes(term))
+  )
+
+  if (sort === 'alpha') rows.sort((a,b) => (a.name||'').localeCompare(b.name||''))
+  else if (sort === 'low') rows.sort((a,b) => (a.price||0) - (b.price||0))
+  else if (sort === 'high') rows.sort((a,b) => (b.price||0) - (a.price||0))
+  else rows.sort((a,b) => Number(b.featured) - Number(a.featured))
+
+  renderCards(rows)
+  renderTable(rows)
+}
+
+function imgTag(p) {
+  return (p.images && p.images[0]) ? '<img class="thumb" src="' + escA(p.images[0]) + '" alt="">' : '<div class="thumb placeholder">📷</div>'
+}
+
+function renderCards(rows) {
+  const grid = document.getElementById('cardsGrid')
+  if (!rows.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="big">📦</div>' +
+      (products.length ? 'No items match your search.' : 'No products yet. Click "Add Item" to create one.') + '</div>'
+    return
+  }
+  grid.innerHTML = rows.map(p => {
+    const img = (p.images && p.images[0])
+      ? '<img src="' + escA(p.images[0]) + '" alt="">'
+      : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px;color:#aab4c2">📷</div>'
+    let badges = ''
+    if (p.newArrival) badges = '<span class="pc-badge new">NEW</span>'
+    if (p.originalPrice > p.price) badges += '<span class="pc-badge">' +
+      Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) + '% OFF</span>'
+    return '<div class="pc">' +
+      '<div class="pc-img">' + img + badges + '</div>' +
+      '<div class="pc-body">' +
+        '<span class="pc-brand">' + esc(p.brand || '') + '</span>' +
+        '<span class="pc-cat">' + esc(p.category || '') + '</span>' +
+        '<h3 class="pc-name">' + esc(p.name || 'Untitled') + '</h3>' +
+        (p.model ? '<span class="pc-model">Model: ' + esc(p.model) + '</span>' : '') +
+        '<div class="pc-price"><span class="p">' + fmt(p.price) + '</span>' +
+          (p.originalPrice > p.price ? '<span class="o">' + fmt(p.originalPrice) + '</span>' : '') + '</div>' +
+        '<div class="pc-btns">' +
+          '<button class="pc-edit" onclick="openForm(\'' + escId(p.id) + '\')">✏ Edit</button>' +
+          '<a class="pc-wa" target="_blank" rel="noreferrer" href="' + waLink(p) + '">💬 Inquire</a>' +
+        '</div>' +
+      '</div></div>'
+  }).join('')
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('tbody')
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty"><div class="big">📦</div>' +
+      (products.length ? 'No items match your search.' : 'No products yet.') + '</td></tr>'
+    return
+  }
+  tbody.innerHTML = rows.map(p => {
+    const badges = []
+    badges.push(p.stock === 0 ? '<span class="badge out">Out of stock</span>' : '<span class="badge in">In stock</span>')
+    if (p.newArrival) badges.push('<span class="badge new">NEW</span>')
+    if (p.featured) badges.push('<span class="badge feat">Featured</span>')
+    return '<tr>' +
+      '<td>' + imgTag(p) + '</td>' +
+      '<td class="name-cell"><strong>' + esc(p.name || 'Untitled') + '</strong><span>' + esc(p.brand||'') + (p.model ? ' · ' + esc(p.model) : '') + '</span></td>' +
+      '<td>' + esc(p.category||'') + (p.categoryGroup && p.categoryGroup !== p.category ? '<br><small style="color:var(--muted)">' + esc(p.categoryGroup) + '</small>' : '') + '</td>' +
+      '<td><strong>' + fmt(p.price) + '</strong>' + (p.originalPrice > p.price ? '<br><small style="color:var(--muted);text-decoration:line-through">' + fmt(p.originalPrice) + '</small>' : '') + '</td>' +
+      '<td>' + badges.join('') + '</td>' +
+      '<td class="actions">' +
+        '<button class="btn btn-blue btn-sm" onclick="openForm(\'' + escId(p.id) + '\')">✏ Edit</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="removeProduct(\'' + escId(p.id) + '\')">🗑</button>' +
+      '</td></tr>'
+  }).join('')
+}
+
+// ---------------------------------------------------------------- delete
+function removeProduct(id) {
+  const p = products.find(x => x.id === id)
+  if (!p) return
+  if (!confirm('Delete "' + (p.name || id) + '"?')) return
+  products = products.filter(x => x.id !== id)
+  saveProducts(); render()
+  if (supabaseClient) dbDelete(id).then(({ error }) => { if (error) console.warn('Supabase delete failed:', error.message) })
+  toast('Item deleted')
+}
+
+// ---------------------------------------------------------------- form
+function openForm(id) {
+  const p = id ? products.find(x => x.id === id) : null
+  editingId = id || null
+  photoData = p && p.images ? p.images.slice() : []
+
+  document.getElementById('formTitle').textContent = p ? 'Edit Item' : 'Add Item'
+  document.getElementById('f-name').value = p ? p.name || '' : ''
+  document.getElementById('f-brand').value = p ? p.brand || '' : ''
+  document.getElementById('f-category').value = p ? p.category || '' : ''
+  document.getElementById('f-catgroup').value = p ? p.categoryGroup || '' : ''
+  document.getElementById('f-model').value = p ? p.model || '' : ''
+  document.getElementById('f-price').value = p ? p.price || '' : ''
+  document.getElementById('f-oprice').value = p ? p.originalPrice || '' : ''
+  document.getElementById('f-stock').value = p ? p.stock ?? 0 : 0
+  document.getElementById('f-rating').value = p ? p.rating || '' : 4.5
+  document.getElementById('f-reviews').value = p ? p.reviewCount || '' : 0
+  document.getElementById('f-instock').checked = p ? p.inStock !== false : true
+  document.getElementById('f-new').checked = p ? !!p.newArrival : false
+  document.getElementById('f-featured').checked = p ? !!p.featured : false
+  document.getElementById('f-bestseller').checked = p ? !!p.bestSeller : false
+  document.getElementById('f-desc').value = p ? p.description || '' : ''
+  document.getElementById('f-features').value = p && p.features ? p.features.join('\n') : ''
+  document.getElementById('f-warranty').value = p ? p.warranty || '' : ''
+  document.getElementById('f-delivery').value = p ? p.delivery || '' : ''
+
+  document.getElementById('formDeleteBtn').style.display = p ? 'inline-block' : 'none'
+  renderPhotos()
+  renderSpecs(p && p.specs ? p.specs : {})
+  document.getElementById('overlay').classList.add('open')
+  document.getElementById('f-name').focus()
+}
+
+function closeForm() {
+  document.getElementById('overlay').classList.remove('open')
+  editingId = null
+  photoData = []
+}
+
+function renderPhotos() {
+  const wrap = document.getElementById('f-photos')
+  let html = photoData.map((src, i) =>
+    '<div class="photo"><img src="' + escA(src) + '" alt="photo"><button onclick="removePhoto(' + i + ')" title="Remove">✕</button></div>'
+  ).join('')
+  if (photoData.length < 4) html += '<div class="drop" onclick="document.getElementById(\'f-file\').click()">＋<br>Add</div>'
+  wrap.innerHTML = html
+}
+
+function removePhoto(i) {
+  photoData.splice(i, 1)
+  renderPhotos()
+}
+
+function addFiles(e) {
+  const files = Array.from(e.target.files || [])
+  e.target.value = ''
+  const remaining = 4 - photoData.length
+  const toAdd = files.slice(0, Math.max(0, remaining))
+  if (files.length > remaining) toast('Max 4 photos per item', 'err')
+  toAdd.forEach(compressAndAdd)
+}
+
+function compressAndAdd(file) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const img = new Image()
+    img.onload = () => {
+      const maxDim = 900
+      let { width, height } = img
+      const scale = Math.min(1, maxDim / Math.max(width, height))
+      width = Math.round(width * scale); height = Math.round(height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      photoData.push(canvas.toDataURL('image/jpeg', 0.72))
+      renderPhotos()
+    }
+    img.onerror = () => toast('Could not read image', 'err')
+    img.src = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+function renderSpecs(specs) {
+  const wrap = document.getElementById('specsRows')
+  wrap.innerHTML = ''
+  Object.entries(specs || {}).forEach(([k, v]) => addSpecRow(k, v))
+  if (!Object.keys(specs || {}).length) addSpecRow()
+}
+
+function addSpecRow(key, val) {
+  const wrap = document.getElementById('specsRows')
+  const row = document.createElement('div')
+  row.className = 'spec-row'
+  row.innerHTML = '<input type="text" placeholder="Spec name" value="' + escA(key || '') + '">' +
+    '<input type="text" placeholder="Value" value="' + escA(val || '') + '">' +
+    '<button type="button" class="icon-btn" onclick="this.parentElement.remove()">🗑</button>'
+  wrap.appendChild(row)
+}
+
+// ---------------------------------------------------------------- save
+function saveForm() {
+  const name = document.getElementById('f-name').value.trim()
+  const category = document.getElementById('f-category').value.trim()
+  const price = Number(document.getElementById('f-price').value)
+
+  if (!name) { toast('Item name is required', 'err'); document.getElementById('f-name').focus(); return }
+  if (!category) { toast('Category is required', 'err'); document.getElementById('f-category').focus(); return }
+  if (!(price >= 0)) { toast('Please enter a valid price', 'err'); document.getElementById('f-price').focus(); return }
+
+  const specs = {}
+  document.querySelectorAll('#specsRows .spec-row').forEach(row => {
+    const k = row.children[0].value.trim()
+    const v = row.children[1].value.trim()
+    if (k && v) specs[k] = v
+  })
+
+  const features = document.getElementById('f-features').value
+    .split('\n').map(s => s.trim()).filter(Boolean)
+
+  const data = {
+    id: editingId || newId(),
+    name: name,
+    brand: document.getElementById('f-brand').value.trim(),
+    category: category,
+    categoryGroup: document.getElementById('f-catgroup').value.trim(),
+    model: document.getElementById('f-model').value.trim(),
+    price: price,
+    originalPrice: Number(document.getElementById('f-oprice').value) || 0,
+    stock: Number(document.getElementById('f-stock').value) || 0,
+    rating: Number(document.getElementById('f-rating').value) || 0,
+    reviewCount: Number(document.getElementById('f-reviews').value) || 0,
+    inStock: document.getElementById('f-instock').checked,
+    newArrival: document.getElementById('f-new').checked,
+    featured: document.getElementById('f-featured').checked,
+    bestSeller: document.getElementById('f-bestseller').checked,
+    images: photoData.slice(),
+    description: document.getElementById('f-desc').value.trim(),
+    features: features,
+    specs: specs,
+    warranty: document.getElementById('f-warranty').value.trim(),
+    delivery: document.getElementById('f-delivery').value.trim()
+  }
+
+  if (editingId) {
+    const idx = products.findIndex(x => x.id === editingId)
+    if (idx >= 0) products[idx] = data
+  } else {
+    products.push(data)
+  }
+
+  saveProducts(); render(); closeForm()
+  if (supabaseClient) dbUpsert(data).then(({ error }) => { if (error) console.warn('Supabase save failed:', error.message) })
+  toast(editingId ? 'Item updated' : 'Item added', 'ok')
+  editingId = null
+}
+
+function deleteCurrent() {
+  if (!editingId) return
+  if (!confirm('Delete this item?')) return
+  removeProduct(editingId)
+  closeForm()
+}
+
+// ---------------------------------------------------------------- import / export
+function exportJson() {
+  const blob = new Blob([JSON.stringify(products, null, 2)], { type: 'application/json' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = 'panchakanya-items-' + new Date().toISOString().slice(0, 10) + '.json'
+  a.click()
+  URL.revokeObjectURL(a.href)
+  toast('Backup downloaded')
+}
+
+function importJson(e) {
+  const file = e.target.files[0]
+  e.target.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result)
+      if (!Array.isArray(data)) throw new Error('not array')
+      if (!confirm('Replace ' + products.length + ' current items with ' + data.length + ' items from this file?')) return
+      products = data
+      saveProducts(); render()
+      if (supabaseClient) supabaseClient.from('products').upsert(products.map(productToRow))
+        .then(({ error }) => { if (error) console.warn('Supabase import failed:', error.message) })
+      toast('Catalog imported', 'ok')
+    } catch (err) {
+      toast('Invalid JSON file', 'err')
+    }
+  }
+  reader.readAsText(file)
+}
+
+// ---------------------------------------------------------------- init
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeForm() })
+if (loginOk()) document.getElementById('loginGate').classList.add('hidden')
+loadProducts()
+render()
+dbLoad()
+</script>
+</body>
+</html>
