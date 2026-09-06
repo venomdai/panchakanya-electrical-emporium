@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist --nojekyll"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",
