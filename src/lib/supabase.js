@@ -70,3 +70,15 @@ export const siteContentToRow = (s) => ({
   hours: s.hours,
   about: s.about,
 })
+
+export const rowToBrand = (r) => ({
+  id: r.id,
+  name: r.name,
+  logo: r.logo,
+})
+
+export const brandToRow = (b) => ({
+  id: b.id,
+  name: b.name,
+  logo: b.logo,
+})

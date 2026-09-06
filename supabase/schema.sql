@@ -41,6 +41,38 @@ grant select, insert, update, delete on public.products to anon;
 grant select, insert, update, delete on public.products to authenticated;
 
 -- ============================================================
+-- BRANDS
+-- ============================================================
+create table if not exists public.brands (
+  id         serial primary key,
+  name       text not null unique,
+  logo       text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table public.brands enable row level security;
+
+create policy "Brands: public read"   on public.brands for select using (true);
+create policy "Brands: public insert" on public.brands for insert with check (true);
+create policy "Brands: public update" on public.brands for update using (true) with check (true);
+create policy "Brands: public delete" on public.brands for delete using (true);
+
+grant select, insert, update, delete on public.brands to anon;
+grant select, insert, update, delete on public.brands to authenticated;
+
+-- Seed initial brands (excluding Baltra)
+insert into public.brands (name, logo)
+select v.name, v.logo from (values
+  ('Better', '/Better.png'),
+  ('Crompton', '/Crompton.png'),
+  ('CG', '/CG.jpg'),
+  ('LG', '/LG-Logo.jpg'),
+  ('Samsung', '/Samsung.jpg')
+) as v(name, logo)
+on conflict (name) do nothing;
+
+-- ============================================================
 -- SITE CONTENT  (single row, id = 'main')
 -- ============================================================
 create table if not exists public.site_content (

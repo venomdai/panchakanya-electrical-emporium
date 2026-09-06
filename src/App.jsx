@@ -99,18 +99,16 @@ const getProductImage = (product) => asset((product.images && product.images[0])
 // ============================================================================
 // BRANDS
 // ============================================================================
-const BRANDS_DATA = [  {
- id: 'better', name: 'Better', logo: '/Better.png' }
+const DEFAULT_BRANDS = [  {
+ name: 'Better', logo: '/Better.png' }
 ,  {
- id: 'baltra', name: 'Baltra', logo: '/Baltra.png' }
+ name: 'Crompton', logo: '/Crompton.png' }
 ,  {
- id: 'crompton', name: 'Crompton', logo: '/Crompton.png' }
+ name: 'CG', logo: '/CG.jpg' }
 ,  {
- id: 'cg', name: 'CG', logo: '/CG.jpg' }
+ name: 'LG', logo: '/LG-Logo.jpg' }
 ,  {
- id: 'lg', name: 'LG', logo: '/LG-Logo.jpg' }
-,  {
- id: 'samsung', name: 'Samsung', logo: '/Samsung.jpg' }
+ name: 'Samsung', logo: '/Samsung.jpg' }
 ,]
 // ============================================================================
 // DEFAULT PRODUCTS (SAMPLE DATA - Ready for replacement)
@@ -124,7 +122,7 @@ const defaultProducts = [  {
  Capacity: '7 KG', Energy: '5 Star', Control: 'Fully Automatic', Warranty: '2 Years' }
 ,    warranty: '2 Year Warranty on Motor',    delivery: 'Home delivery and installation support available.',  }
 ,  {
-    id: 'prod-4',    name: 'Baltra Electric Rice Cooker',    brand: 'Baltra',    category: 'Electric Rice Cooker',    categoryGroup: 'Kitchen Appliances',    model: 'RC-5.5',    price: 4999,    originalPrice: 6299,    stock: 19,    rating: 4.6,    reviewCount: 68,    inStock: true,    newArrival: false,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=80'],    description: 'Easy-to-use rice cooker with multiple cooking modes.',    features: ['Multi-cook function', 'Keep warm mode', 'Non-stick inner pot', 'Safe locking lid'],    specs: {
+    id: 'prod-4',    name: 'Better Electric Rice Cooker',    brand: 'Better',    category: 'Electric Rice Cooker',    categoryGroup: 'Kitchen Appliances',    model: 'RC-5.5',    price: 4999,    originalPrice: 6299,    stock: 19,    rating: 4.6,    reviewCount: 68,    inStock: true,    newArrival: false,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=80'],    description: 'Easy-to-use rice cooker with multiple cooking modes.',    features: ['Multi-cook function', 'Keep warm mode', 'Non-stick inner pot', 'Safe locking lid'],    specs: {
  Capacity: '5.5 Cups', Power: '700W', Features: 'Keep Warm', Warranty: '1 Year' }
 ,    warranty: '1 Year Warranty',    delivery: 'Delivery and demo guidance available at the store.',  }
 ,  {
@@ -136,7 +134,7 @@ const defaultProducts = [  {
  Size: '120 CM', Speed: '3 Speed', Power: '60W', Warranty: '1 Year' }
 ,    warranty: '1 Year Motor Warranty',    delivery: 'Quick delivery across Chitwan.',  }
 ,  {
-    id: 'prod-9',    name: 'Baltra Induction Cooker',    brand: 'Baltra',    category: 'Induction Stove',    categoryGroup: 'Kitchen Appliances',    model: 'IC-1800',    price: 6599,    originalPrice: 7999,    stock: 17,    rating: 4.5,    reviewCount: 47,    inStock: true,    newArrival: true,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'],    description: 'Compact induction cooker for fast, energy-saving cooking.',    features: ['1800W power', 'Touch panel', 'Energy efficient', 'Safety shutoff'],    specs: {
+    id: 'prod-9',    name: 'Better Induction Cooker',    brand: 'Better',    category: 'Induction Stove',    categoryGroup: 'Kitchen Appliances',    model: 'IC-1800',    price: 6599,    originalPrice: 7999,    stock: 17,    rating: 4.5,    reviewCount: 47,    inStock: true,    newArrival: true,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'],    description: 'Compact induction cooker for fast, energy-saving cooking.',    features: ['1800W power', 'Touch panel', 'Energy efficient', 'Safety shutoff'],    specs: {
  Power: '1800W', Voltage: '220V', Controls: 'Touch', Warranty: '1 Year' }
 ,    warranty: '1 Year Service Warranty',    delivery: 'Delivered to your door in Chitwan.',  }
 ,  {
@@ -148,7 +146,7 @@ const defaultProducts = [  {
  Power: '48W', Color: 'Warm White', Type: 'Decorative Chandelier', Warranty: '1 Year' }
 ,    warranty: '1 Year Product Warranty',    delivery: 'Careful delivery with installation guidance.',  }
 ,  {
-    id: 'prod-kitchen-chimney',    name: 'Kitchen Chimney',    brand: 'Baltra',    category: 'Kitchen Chimney',    categoryGroup: 'Kitchen Appliances',    model: 'KC-60',    price: 18999,    originalPrice: 22999,    stock: 10,    rating: 4.5,    reviewCount: 24,    inStock: true,    newArrival: true,    featured: false,    bestSeller: false,    images: ['https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80'],    description: 'Powerful kitchen chimney that keeps your kitchen smoke-free and clean.',    features: ['High suction power', 'Toughened glass', 'Easy to clean filters', 'Sleek design'],    specs: {
+    id: 'prod-kitchen-chimney',    name: 'Kitchen Chimney',    brand: 'CG',    category: 'Kitchen Chimney',    categoryGroup: 'Kitchen Appliances',    model: 'KC-60',    price: 18999,    originalPrice: 22999,    stock: 10,    rating: 4.5,    reviewCount: 24,    inStock: true,    newArrival: true,    featured: false,    bestSeller: false,    images: ['https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80'],    description: 'Powerful kitchen chimney that keeps your kitchen smoke-free and clean.',    features: ['High suction power', 'Toughened glass', 'Easy to clean filters', 'Sleek design'],    specs: {
  Size: '60 CM', Suction: '1000 m3/h', Type: 'Wall Mounted', Warranty: '1 Year' }
 ,    warranty: '1 Year Warranty',    delivery: 'Delivery and installation support available.',  }
 ,  {
@@ -156,7 +154,7 @@ const defaultProducts = [  {
  Capacity: '20L', Power: '800W', Type: 'Microwave Oven', Warranty: '1 Year' }
 ,    warranty: '1 Year Warranty',    delivery: 'Home delivery available across Chitwan.',  }
 ,  {
-    id: 'prod-induction-cooktop',    name: 'Induction Cooktop',    brand: 'Baltra',    category: 'Induction Cooktops',    categoryGroup: 'Kitchen Appliances',    model: 'IC-2000',    price: 6999,    originalPrice: 8499,    stock: 15,    rating: 4.5,    reviewCount: 39,    inStock: true,    newArrival: true,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'],    description: 'Fast and energy-efficient induction cooktop for daily cooking.',    features: ['2000W power', 'Touch controls', 'Energy efficient', 'Safety lock'],    specs: {
+    id: 'prod-induction-cooktop',    name: 'Induction Cooktop',    brand: 'LG',    category: 'Induction Cooktops',    categoryGroup: 'Kitchen Appliances',    model: 'IC-2000',    price: 6999,    originalPrice: 8499,    stock: 15,    rating: 4.5,    reviewCount: 39,    inStock: true,    newArrival: true,    featured: false,    bestSeller: true,    images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'],    description: 'Fast and energy-efficient induction cooktop for daily cooking.',    features: ['2000W power', 'Touch controls', 'Energy efficient', 'Safety lock'],    specs: {
  Power: '2000W', Type: 'Induction Cooktop', Controls: 'Touch', Warranty: '1 Year' }
 ,    warranty: '1 Year Warranty',    delivery: 'Delivered to your door in Chitwan.',  }
 ,  {
@@ -392,7 +390,10 @@ function App() {
   
 // State - Products & Catalog
   
-const [products, setProducts] = useState(() => persistedState('panchakanya-products-v8', defaultProducts))
+const [products, setProducts] = useState(() => {
+    const loaded = persistedState('panchakanya-products-v8', defaultProducts)
+    return loaded.filter((p) => String(p.brand || '').toLowerCase() !== 'baltra')
+  })
   
 const [searchTerm, setSearchTerm] = useState('')
   
@@ -413,13 +414,22 @@ const [showScrollTop, setShowScrollTop] = useState(false)
 // State - Site Content
   
 const [siteContent, setSiteContent] = useState(() => persistedState('panchakanya-content', defaultSiteContent))  
+// State - Brands
+const [brands, setBrands] = useState(() => {
+    const stored = persistedState('panchakanya-brands', null)
+    if (Array.isArray(stored) && stored.length) return stored
+    return DEFAULT_BRANDS.map((b, i) => ({ id: i + 1, ...b }))
+  })
 // Persist state changes
   useEffect(() => {
  localStorage.setItem('panchakanya-products-v8', JSON.stringify(products)) }
 , [products])
   useEffect(() => {
  localStorage.setItem('panchakanya-content', JSON.stringify(siteContent)) }
-, [siteContent])  
+, [siteContent])
+  useEffect(() => {
+ localStorage.setItem('panchakanya-brands', JSON.stringify(brands)) }
+, [brands])  
 // Sync catalog with Supabase on load
   const initialProductsRef = useRef(products)
   const initialSiteContentRef = useRef(siteContent)
@@ -429,10 +439,19 @@ const [siteContent, setSiteContent] = useState(() => persistedState('panchakanya
         const { data: rows, error } = await supabase.from('products').select('*').limit(5000)
         if (error) throw error
         if (rows && rows.length) {
-          setProducts(rows.map(rowToProduct))
+          setProducts(rows.map(rowToProduct).filter((p) => String(p.brand || '').toLowerCase() !== 'baltra'))
         } else if (initialProductsRef.current.length) {
           const { error: upsertError } = await supabase.from('products').upsert(initialProductsRef.current.map(productToRow))
           if (upsertError) console.warn('Could not seed products to Supabase:', upsertError.message)
+        }
+        const { data: brandRows, error: brandErr } = await supabase.from('brands').select('*').limit(1000)
+        if (!brandErr && brandRows && brandRows.length) {
+          const mapped = brandRows.map(rowToBrand).filter((b) => String(b.name || '').toLowerCase() !== 'baltra')
+          setBrands(mapped)
+        } else if (!brandErr && (!brandRows || !brandRows.length)) {
+          const seeds = DEFAULT_BRANDS.map((b) => ({ name: b.name, logo: b.logo }))
+          const { error: brandInsErr } = await supabase.from('brands').insert(seeds)
+          if (brandInsErr) console.warn('Could not seed brands:', brandInsErr.message)
         }
         const content = await supabase.from('site_content').select('*').eq('id', 'main').maybeSingle()
         if (content.error) throw content.error
@@ -453,6 +472,24 @@ const [siteContent, setSiteContent] = useState(() => persistedState('panchakanya
     const onScroll = () => setShowScrollTop(window.scrollY > 400)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  // Scroll reveal animation
+  useEffect(() => {
+    const els = document.querySelectorAll('section, .reveal')
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('revealed'))
+      return
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed')
+          observer.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' })
+    els.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
   useEffect(() => {
     const onKey = (e) => {
@@ -520,7 +557,7 @@ return filtered  }
   
 const featuredProducts = useMemo(    () => products.filter((p) => p.featured).slice(0, 6),    [products]  )  // Unique list of brands from products (for brand filter)
   
-const brandOptions = useMemo(    () => ['All', ...new Set(products.map((p) => p.brand).filter(Boolean))].sort(),    [products]  )
+const brandOptions = useMemo(    () => ['All', ...new Set([...brands.map((b) => b.name), ...products.map((p) => p.brand)].filter(Boolean))].sort(),    [brands, products]  )
   
 const resetFilters = () => {
     setSelectedBrand('All')
@@ -536,9 +573,9 @@ const resetFilters = () => {
   
 return (    <div className="app-shell">      {
 /* NAVBAR */}
-      <header className="navbar">        <div className="navbar-container">          <div className="navbar-brand">            <button className="navbar-toggle" onClick={
+      <header className="navbar">        <div className="navbar-container">          <div className="navbar-brand">            <button className={`navbar-toggle ${menuOpen ? 'open' : ''}`} onClick={
 () => setMenuOpen(!menuOpen)}
->☰</button>            <div className="logo">              <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>          </div>          <div className={
+>              <span className="hamburger hamburger-1"></span>              <span className="hamburger hamburger-2"></span>              <span className="hamburger hamburger-3"></span>            </button>            <div className="logo">              <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>          </div>          <div className={
 `navbar-menu ${menuOpen ? 'active' : ''}`
 }
 >            <a href="#home" onClick={
@@ -558,20 +595,20 @@ searchTerm}
             />            <a href={
 `https://wa.me/${WHATSAPP_NUMBER}`
 }
- className="navbar-cta" target="_blank" rel="noreferrer">              💬 WhatsApp            </a>          </div>        </div>      </header>      <main className="store-main">        {
+ className="navbar-cta" target="_blank" rel="noreferrer">              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Zm0 18.15a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.78.81-2.98-.2-.31A8.15 8.15 0 1 1 12 20.15Zm4.47-6.11c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.77.95-.29.18-.53.06a6.68 6.68 0 0 1-3.37-2.94c-.25-.43.25-.4.72-1.33a.45.45 0 0 0-.02-.43c-.06-.12-.55-1.32-.75-1.81s-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.73 2.73 0 0 0-.86 2.05 4.75 4.75 0 0 0 1 2.52 10.78 10.78 0 0 0 4.13 3.67 14.13 14.13 0 0 0 1.38.51 3.3 3.3 0 0 0 1.52.1 2.47 2.47 0 0 0 1.62-1.15 2 2 0 0 0 .14-1.15c-.06-.11-.23-.18-.47-.3Z"/></svg> WhatsApp            </a>            <a href={asset('/item.html')} className="admin-link" title="Manage products (owner)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.49.49 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.42h-3.84a.48.48 0 0 0-.48.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.19 8.74a.49.49 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .61.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54c.05.23.25.42.48.42h3.84c.23 0 .43-.19.48-.42l.36-2.54a7.3 7.3 0 0 0 1.62-.94l2.39.96c.23.09.5 0 .61-.22l1.92-3.32a.49.49 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg> Admin</a>          </div>        </div>      </header>      <main className="store-main">        {
 /* HERO SECTION */}
-        <section id="home" className="hero">          <div className="container hero-container">            <div className="hero-content">              <span className="hero-eyebrow">🏪 Trusted Electrical Emporium</span>              <h1>Quality Electrical & Home Appliances</h1>              <p>Premium fans, coolers, AC, appliances & electrical products from trusted brands</p>              <div className="hero-buttons">                <button className="btn-primary" onClick={
+        <section id="home" className="hero">          <div className="container hero-container">            <div className="hero-content">              <span className="hero-eyebrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg> Trusted Electrical Emporium</span>              <h1>Power Your Home with <span className="text-gradient">Premium Electronics</span></h1>              <p>Premium fans, coolers, AC, appliances & electrical products from trusted brands — with honest prices and dependable after-sales support in Tandi, Chitwan.</p>              <div className="hero-buttons">                <button className="btn-primary" onClick={
 () => {
  document.getElementById('shop').scrollIntoView({
  behavior: 'smooth' }
 ) }
 }
->Explore Products</button>                <a href={
+>Explore Products <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>                <a href={
 `https://wa.me/${WHATSAPP_NUMBER}`
 }
- className="btn-secondary" target="_blank" rel="noreferrer">📱 Chat on WhatsApp</a>              </div>            </div>            <div className="hero-collage">              <div className="collage-grid">                <div className="collage-item collage-card-1">                  <img src={asset('/AC.png')} alt="AC" />                  <span className="collage-badge">❄️ Air Conditioner</span>                </div>                <div className="collage-item collage-card-2">                  <img src={asset('/Cooler.png')} alt="Air Cooler" />                  <span className="collage-badge">💨 Air Cooler</span>                </div>                <div className="collage-item collage-card-3">                  <img src={asset('/Fan.jpg')} alt="Fans" />                  <span className="collage-badge">🌀 Fans</span>                </div>                <div className="collage-item collage-card-4">                  <img src={asset('/Lights.jpg')} alt="Lights" />                  <span className="collage-badge">💡 Lights</span>                </div>              </div>            </div>          </div>        </section>        {
+ className="btn-secondary" target="_blank" rel="noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Zm0 18.15a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.78.81-2.98-.2-.31A8.15 8.15 0 1 1 12 20.15Zm4.47-6.11c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.77.95-.29.18-.53.06a6.68 6.68 0 0 1-3.37-2.94c-.25-.43.25-.4.72-1.33a.45.45 0 0 0-.02-.43c-.06-.12-.55-1.32-.75-1.81s-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.73 2.73 0 0 0-.86 2.05 4.75 4.75 0 0 0 1 2.52 10.78 10.78 0 0 0 4.13 3.67 14.13 14.13 0 0 0 1.38.51 3.3 3.3 0 0 0 1.52.1 2.47 2.47 0 0 0 1.62-1.15 2 2 0 0 0 .14-1.15c-.06-.11-.23-.18-.47-.3Z"/></svg> Chat on WhatsApp</a>              </div>              <div className="hero-stats">                <div className="hero-stat"><strong>50+</strong><span>Trusted Brands</span></div>                <div className="hero-stat"><strong>500+</strong><span>Products</span></div>                <div className="hero-stat"><strong>10+</strong><span>Years Experience</span></div>              </div>            </div>            <div className="hero-collage">              <div className="collage-grid">                <div className="collage-item collage-card-1">                  <img src={asset('/AC.png')} alt="AC" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h4v6h6a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-6v6H7v-6H4v-4h3V2Z"/></svg> Air Conditioner</span>                </div>                <div className="collage-item collage-card-2">                  <img src={asset('/Cooler.png')} alt="Air Cooler" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 8c6-2 12-2 18 0"/><path d="M3 12c6-2 12-2 18 0"/><path d="M3 16c6-2 12-2 18 0"/><path d="M9 3l-2 2m8-2 2 2"/></svg> Air Cooler</span>                </div>                <div className="collage-item collage-card-3">                  <img src={asset('/Fan.jpg')} alt="Fans" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM12 3c4.42 0 8 1.72 8 4s-3.58 4-8 4-8-1.72-8-4 3.58-4 8-4Zm0 9c4.42 0 8 1.72 8 4s-3.58 4-8 4-8-1.72-8-4 3.58-4 8-4Zm0 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg> Fans</span>                </div>                <div className="collage-item collage-card-4">                  <img src={asset('/Lights.jpg')} alt="Lights" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg> Lights</span>                </div>              </div>            </div>          </div>        </section>        {
 /* TRUST STRIP */}
-        <section className="trust-strip">          <div className="container trust-grid">            <div className="trust-item">              <span className="trust-icon">✅</span>              <div>                <strong>Genuine Brands</strong>                <small>Trusted, original products</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">🚚</span>              <div>                <strong>Fast Delivery</strong>                <small>Across Chitwan</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">🛠️</span>              <div>                <strong>Installation Support</strong>                <small>Free guidance at the store</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon">💬</span>              <div>                <strong>WhatsApp Support</strong>                <small>Instant replies</small>              </div>            </div>          </div>        </section>        {
+        <section className="trust-strip">          <div className="container trust-grid">            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>              <div>                <strong>Genuine Brands</strong>                <small>Trusted, original products</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></span>              <div>                <strong>Fast Delivery</strong>                <small>Across Chitwan</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg></span>              <div>                <strong>Installation Support</strong>                <small>Free guidance at the store</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg></span>              <div>                <strong>WhatsApp Support</strong>                <small>Instant replies</small>              </div>            </div>          </div>        </section>        {
 /* SHOP BY CATEGORY SECTION */}
         <section id="categories" className="shop-by-category">          <div className="container">            <div className="section-header">              <h2>Everything Your Home Needs</h2>              <p>Browse our comprehensive collection by category</p>            </div>            <div className="category-showcase-grid">              <div className="category-showcase-card">                <div className="category-showcase-icon">🍳</div>                <h3>Kitchen Appliances</h3>                <ul>                  <li>Kitchen Chimney</li>                  <li>Rice Cooker</li>                  <li>Induction Cooktops</li>                </ul>                <button className="category-showcase-btn" onClick={
 () => {
@@ -604,37 +641,15 @@ searchTerm}
 >Shop Now →</button>              </div>            </div>          </div>        </section>        {
 /* BRANDS SECTION */}
         <section id="brands" className="brands-section">          <div className="container">            <div className="section-header">              <h2>Our Trusted Brands</h2>              <p>We supply quality products from leading brands</p>            </div>            <div className="brands-grid">              {
-BRANDS_DATA.map((brand) => (                <button                  key={
-brand.id}
-                  className={
-`brand-card ${selectedBrand === brand.name ? 'active' : ''}`
-}
-                  onClick={
-() => {
-                    setSelectedBrand(selectedBrand === brand.name ? 'All' : brand.name)
-                    document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                  }
-}
-                  title={
-`Filter by ${brand.name}`
-}
-                >                  <img src={asset(brand.logo)}
- alt={
-brand.name}
- className="brand-logo-image" />                  <span className="brand-name">{
-brand.name}
-</span>                </button>              ))}
-              <button                className={
-`brand-card ${selectedBrand === 'All' ? 'active' : ''}`
-}
-                onClick={
-() => {
-                  setSelectedBrand('All')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
-}
+brands.map((brand) => (                <button                  key={brand.id || brand.name}
+                  className={ `brand-card ${selectedBrand === brand.name ? 'active' : ''}` }
+                  onClick={ () => { setSelectedBrand(selectedBrand === brand.name ? 'All' : brand.name); document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }) } }
+                  title={ `Filter by ${brand.name}` }
+                >                  { brand.logo && brand.logo !== '✨' ? <img src={asset(brand.logo)} alt={brand.name} className="brand-logo-image" /> : <span className="brand-logo">✨</span> }
+                  <span className="brand-name">{brand.name}</span>
+                </button>              ))}
+              <button                className={ `brand-card ${selectedBrand === 'All' ? 'active' : ''}` }
+                onClick={ () => { setSelectedBrand('All'); document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }) } }
               >                <span className="brand-logo">✨</span>                <span className="brand-name">All Brands</span>              </button>            </div>          </div>        </section>        {
 /* FEATURED PRODUCTS */}
         <section className="featured-products">          <div className="container">            <div className="section-header">              <h2>Featured Products</h2>              <p>Our best-selling items</p>            </div>            <div className="products-grid">              {
@@ -650,6 +665,7 @@ Math.round(((product.originalPrice - product.price) / product.originalPrice) * 1
 % OFF                      </span>                    )}
                     {
 product.newArrival && <span className="new-badge">NEW</span>}
+                    <button className="quick-view" onClick={() => setSelectedProduct(product)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg> Quick View</button>
                   </div>                  <div className="product-info">                    <span className="product-brand">{
 product.brand}
 </span>                    <h3>{
@@ -674,7 +690,7 @@ formatNPR(product.originalPrice)}
 () => setSelectedProduct(product)}
 >Details</button>                      <button className="btn-whatsapp" onClick={
 () => setWhatsappConfirm(product)}
->📱 Inquire</button>                    </div>                  </div>                </div>              ))}
+><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg> Inquire</button>                    </div>                  </div>                </div>              ))}
             </div>          </div>        </section>        {
 /* CATEGORIES SECTION */}
         <section id="categories" className="categories-section">          <div className="container">            <div className="section-header">              <h2>Shop by Category</h2>              <p>Browse our organized product categories</p>            </div>            <div className="categories-grid">              {
@@ -763,6 +779,7 @@ Math.round(((product.originalPrice - product.price) / product.originalPrice) * 1
 % OFF                        </span>                      )}
                       {
 product.newArrival && <span className="new-badge">NEW</span>}
+                      <button className="quick-view" onClick={() => setSelectedProduct(product)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg> Quick View</button>
                     </div>                    <div className="product-info">                      <span className="product-brand">{
 product.brand}
 </span>                      <h3>{
@@ -787,7 +804,7 @@ formatNPR(product.originalPrice)}
 () => setSelectedProduct(product)}
 >Details</button>                        <button className="btn-whatsapp" onClick={
 () => setWhatsappConfirm(product)}
->📱 Inquire</button>                      </div>                    </div>                  </div>                ))}
+><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg> Inquire</button>                      </div>                    </div>                  </div>                ))}
               </div>            )}
           </div>        </section>      </main>      {
 /* FOOTER */}
@@ -846,7 +863,7 @@ feature}
 selectedProduct.warranty}
                 </div>                <div className="modal-buttons">                  <button className="btn-primary" onClick={
 () => setWhatsappConfirm(selectedProduct)}
->                    📱 Inquire on WhatsApp                  </button>                  <button className="btn-secondary" onClick={
+>                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg>                    Inquire on WhatsApp                  </button>                  <button className="btn-secondary" onClick={
 () => setSelectedProduct(null)}
 >                    Close                  </button>                </div>              </div>            </div>          </div>        </div>      )}
       {
@@ -874,6 +891,5 @@ formatNPR(whatsappConfirm.price)}
                 >                  Continue to WhatsApp                </button>                <button                   className="btn-secondary"                   onClick={
 () => setWhatsappConfirm(null)}
                 >                  Cancel                </button>              </div>            </div>          </div>        </div>      )}
-      <a href={asset('/item.html')} className="admin-link" title="Manage products (owner)">⚙️ Manage</a>
-    </div>  )}
+      </div>  )}
 export default App
