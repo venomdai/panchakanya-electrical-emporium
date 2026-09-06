@@ -2,6 +2,8 @@ import {
  useEffect, useMemo, useRef, useState }
  from 'react'
 import './App.css'
+import SearchBar from './components/SearchBar.jsx'
+import AiChat from './components/AiChat.jsx'
 import { supabase, rowToProduct, productToRow, rowToSiteContent, siteContentToRow } from './lib/supabase.js'
 // ============================================================================
 // CONFIGURATION & UTILITIES
@@ -94,6 +96,36 @@ const PRODUCT_CATEGORIES = {
  id: 'socket', name: 'Switch & Socket' }
 ,    ],  }
 ,}
+// ============================================================================
+// TRENDING CATEGORIES
+// ============================================================================
+const TRENDING_CATEGORIES = [  {
+  name: 'Air Conditioner', image: '/cat-air-conditioner.png', filter: 'Air Conditioner', tag: 'Cooling' }
+,  {
+  name: 'Air Cooler', image: '/cat-air-cooler.png', filter: 'Cooler', tag: 'Seasonal' }
+,  {
+  name: 'Induction & Infrared', image: '/cat-induction.png', filter: 'Induction Stove', tag: 'Kitchen' }
+,  {
+  name: 'Refrigerator', image: '/cat-refrigerator.png', filter: 'Refrigerator', tag: 'Kitchen' }
+,  {
+  name: 'Stand Fan', image: '/cat-stand-fan.png', filter: 'Stand Fan', tag: 'Fans' }
+,  {
+  name: 'Ceiling Fan', image: '/cat-ceiling-fan.png', filter: 'Ceiling Fan', tag: 'Fans' }
+,  {
+  name: 'Table Fan', image: '/cat-table-fan.png', filter: 'Table Fan', tag: 'Fans' }
+,  {
+  name: 'Juicer', image: '/cat-juicer.png', filter: 'Kitchen Appliances', tag: 'Kitchen' }
+,  {
+  name: 'Rice Cooker', image: '/cat-rice-cooker.png', filter: 'Electric Rice Cooker', tag: 'Kitchen' }
+,  {
+  name: 'Pressure Cooker', image: '/cat-pressure-cooker.png', filter: 'Kitchen Appliances', tag: 'Kitchen' }
+,  {
+  name: 'Mixer Grinder', image: '/cat-mixer-grinder.png', filter: 'Grinder and Mixtures', tag: 'Kitchen' }
+,  {
+  name: 'LPG Gas Stove', image: '/cat-lp-gas-stove.png', filter: 'Kitchen Appliances', tag: 'Kitchen' }
+,  {
+  name: 'Chandelier Lights', image: '/Lights.jpg', filter: 'Lighting & Decor', tag: 'Lighting', luxury: true }
+,]
 const asset = (path) => (path && path.startsWith('/') && !path.startsWith('//') ? import.meta.env.BASE_URL.replace(/\/$/, '') + path : path)
 const getProductImage = (product) => asset((product.images && product.images[0]) || '/PPE.jpg')
 // ============================================================================
@@ -501,15 +533,42 @@ const [brands, setBrands] = useState(() => {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+  // Cart state
+const [cartItems, setCartItems] = useState(() => persistedState('panchakanya-cart', []))
+// Mobile UI state
+const [drawerOpen, setDrawerOpen] = useState(false)
+const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
+const [activeTab, setActiveTab] = useState('home')
+const [chatOpen, setChatOpen] = useState(false)
+// Scroll direction for search collapse
+const lastScrollY = useRef(0)
+const [scrollDir, setScrollDir] = useState('up')
+useEffect(() => {
+  let ticking = false
+  const onScroll = () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY
+        setScrollDir(y > lastScrollY.current && y > 120 ? 'down' : 'up')
+        lastScrollY.current = y
+        ticking = false
+      })
+      ticking = true
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true })
+  return () => window.removeEventListener('scroll', onScroll)
+}, [])
+useEffect(() => { localStorage.setItem('panchakanya-cart', JSON.stringify(cartItems)) }, [cartItems])
   useEffect(() => {
-    const locked = !!(selectedProduct || whatsappConfirm)
+    const locked = !!(selectedProduct || whatsappConfirm || drawerOpen || cartDrawerOpen || chatOpen)
     if (locked) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
     return () => { document.body.style.overflow = '' }
-  }, [selectedProduct, whatsappConfirm])  
+  }, [selectedProduct, whatsappConfirm, drawerOpen, cartDrawerOpen, chatOpen])  
 // ============================================================================
   
 // FILTERING & SORTING LOGIC
@@ -564,6 +623,22 @@ const resetFilters = () => {
     setSelectedCategory('All')
     setSearchTerm('')
     setSortBy('featured')  }
+// Cart helpers
+const cartCount = cartItems.reduce((s, i) => s + i.quantity, 0)
+const cartTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
+const addToCart = (product) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.id === product.id)
+      if (existing) return prev.map((i) => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
+      return [...prev, { id: product.id, name: product.name, price: product.price, image: (product.images && product.images[0]) || '', quantity: 1, brand: product.brand, model: product.model }]
+    })
+    setCartDrawerOpen(true)
+}
+const removeFromCart = (id) => setCartItems((prev) => prev.filter((i) => i.id !== id))
+const updateCartQty = (id, qty) => {
+    if (qty <= 0) return removeFromCart(id)
+    setCartItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity: qty } : i))
+}
   
 // ============================================================================
   
@@ -588,10 +663,17 @@ return (    <div className="app-shell">      {
 () => setMenuOpen(false)}
 >Shop</a>            <a href="#contact" onClick={
 () => setMenuOpen(false)}
->Contact</a>          </div>          <div className="navbar-actions">            <input               type="search"               className="navbar-search"               placeholder="Search products..."               value={
-searchTerm}
-              onChange={
-(e) => setSearchTerm(e.target.value)}
+>Contact</a>          </div>          <div className="navbar-actions">            <SearchBar               products={
+products}
+              getProductImage={
+getProductImage}
+              formatNPR={
+formatNPR}
+              onSelect={
+(p) => setSelectedProduct(p)}
+              onShowAll={
+(q) => { setSearchTerm(q); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
             />            <a href={
 `https://wa.me/${WHATSAPP_NUMBER}`
 }
@@ -609,36 +691,38 @@ searchTerm}
  className="btn-secondary" target="_blank" rel="noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Zm0 18.15a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.78.81-2.98-.2-.31A8.15 8.15 0 1 1 12 20.15Zm4.47-6.11c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.77.95-.29.18-.53.06a6.68 6.68 0 0 1-3.37-2.94c-.25-.43.25-.4.72-1.33a.45.45 0 0 0-.02-.43c-.06-.12-.55-1.32-.75-1.81s-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.73 2.73 0 0 0-.86 2.05 4.75 4.75 0 0 0 1 2.52 10.78 10.78 0 0 0 4.13 3.67 14.13 14.13 0 0 0 1.38.51 3.3 3.3 0 0 0 1.52.1 2.47 2.47 0 0 0 1.62-1.15 2 2 0 0 0 .14-1.15c-.06-.11-.23-.18-.47-.3Z"/></svg> Chat on WhatsApp</a>              </div>              <div className="hero-stats">                <div className="hero-stat"><strong>50+</strong><span>Trusted Brands</span></div>                <div className="hero-stat"><strong>500+</strong><span>Products</span></div>                <div className="hero-stat"><strong>10+</strong><span>Years Experience</span></div>              </div>            </div>            <div className="hero-collage">              <div className="collage-grid">                <div className="collage-item collage-card-1">                  <img src={asset('/AC.png')} alt="AC" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h4v6h6a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-6v6H7v-6H4v-4h3V2Z"/></svg> Air Conditioner</span>                </div>                <div className="collage-item collage-card-2">                  <img src={asset('/Cooler.png')} alt="Air Cooler" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 8c6-2 12-2 18 0"/><path d="M3 12c6-2 12-2 18 0"/><path d="M3 16c6-2 12-2 18 0"/><path d="M9 3l-2 2m8-2 2 2"/></svg> Air Cooler</span>                </div>                <div className="collage-item collage-card-3">                  <img src={asset('/Fan.jpg')} alt="Fans" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM12 3c4.42 0 8 1.72 8 4s-3.58 4-8 4-8-1.72-8-4 3.58-4 8-4Zm0 9c4.42 0 8 1.72 8 4s-3.58 4-8 4-8-1.72-8-4 3.58-4 8-4Zm0 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg> Fans</span>                </div>                <div className="collage-item collage-card-4">                  <img src={asset('/Lights.jpg')} alt="Lights" />                  <span className="collage-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg> Lights</span>                </div>              </div>            </div>          </div>        </section>        {
 /* TRUST STRIP */}
         <section className="trust-strip">          <div className="container trust-grid">            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>              <div>                <strong>Genuine Brands</strong>                <small>Trusted, original products</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></span>              <div>                <strong>Fast Delivery</strong>                <small>Across Chitwan</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></svg></span>              <div>                <strong>Installation Support</strong>                <small>Free guidance at the store</small>              </div>            </div>            <div className="trust-item">              <span className="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg></span>              <div>                <strong>WhatsApp Support</strong>                <small>Instant replies</small>              </div>            </div>          </div>        </section>        {
-/* SHOP BY CATEGORY SECTION */}
-        <section id="categories" className="shop-by-category">          <div className="container">            <div className="section-header">              <h2>Everything Your Home Needs</h2>              <p>Browse our comprehensive collection by category</p>            </div>            <div className="category-showcase-grid">              <div className="category-showcase-card">                <div className="category-showcase-icon">🍳</div>                <h3>Kitchen Appliances</h3>                <ul>                  <li>Kitchen Chimney</li>                  <li>Rice Cooker</li>                  <li>Induction Cooktops</li>                </ul>                <button className="category-showcase-btn" onClick={
+/* TRENDING CATEGORIES SECTION */}
+                <section id="categories" className="trending-categories-section">          <div className="container trending-container">            <div className="section-header trending-header">              <h2>Trending <span className="trending-title-accent">Categories</span></h2>              <p>Shop the most-loved products our customers ask for every day</p>            </div>            <div className="trending-grid">              {
+TRENDING_CATEGORIES.map((cat, i) => (                <button                  key={
+cat.name}
+                  className={
+`trending-card ${cat.luxury ? 'trending-card-luxury' : ''}`}
+                  onClick={
 () => {
-                   setSelectedCategory('Kitchen Appliances')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
+                      setSelectedCategory(cat.filter)
+                      document.getElementById('shop').scrollIntoView({
+  behavior: 'smooth' }
+)                    }
 }
->Shop Now →</button>              </div>              <div className="category-showcase-card">                <div className="category-showcase-icon">🏠</div>                <h3>Home Appliances</h3>                <ul>                  <li>Refrigerator</li>                  <li>Washing Machine</li>                  <li>Cooler & AC</li>                </ul>                <button className="category-showcase-btn" onClick={
-() => {
-                   setSelectedCategory('Home Appliances')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
+                  aria-label={
+`Shop ${cat.name}`}
+                >                  {
+cat.tag && <span className="trending-tag">{
+cat.tag}
+</span>}
+                  <span className="trending-media">                    <img                      src={
+asset(cat.image)}
+                      alt={
+cat.name}
+                      loading={
+i < 7 ? 'eager' : 'lazy'}
+                      onError={
+(e) => { if (!e.currentTarget.dataset.fallback) { e.currentTarget.dataset.fallback = '1'; e.currentTarget.src = asset('/PPE.jpg') } }
 }
->Shop Now →</button>              </div>              <div className="category-showcase-card">                <div className="category-showcase-icon">⚡</div>                <h3>Electrical & Comfort</h3>                <ul>                  <li>Fans</li>                  <li>Chandeliers</li>                  <li>Lighting Solutions</li>                </ul>                <button className="category-showcase-btn" onClick={
-() => {
-                   setSelectedCategory('Fans')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
-}
->Shop Now →</button>              </div>              <div className="category-showcase-card">                <div className="category-showcase-icon">🔋</div>                <h3>Power Solutions</h3>                <ul>                  <li>Inverter</li>                  <li>Battery</li>                  <li>Motors & Pumps</li>                </ul>                <button className="category-showcase-btn" onClick={
-() => {
-                   setSelectedCategory('Electrical & Power')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
-}
->Shop Now →</button>              </div>            </div>          </div>        </section>        {
+                    />                  </span>                  <span className="trending-name">{
+cat.name}
+</span>                  <span className="trending-explore">Explore <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>                </button>              ))}
+              <div className="trending-all" role="button" tabIndex="0" aria-label="View all products" onClick={ () => { resetFilters(); document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }) } } onKeyDown={ (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); resetFilters(); document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }) } } }>                <span className="trending-all-icon">✦</span>                <span className="trending-name">View All Products</span>                <span className="trending-explore">Browse <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>              </div>            </div>          </div>        </section>        {
 /* BRANDS SECTION */}
         <section id="brands" className="brands-section">          <div className="container">            <div className="section-header">              <h2>Our Trusted Brands</h2>              <p>We supply quality products from leading brands</p>            </div>            <div className="brands-grid">              {
 brands.map((brand) => (                <button                  key={brand.id || brand.name}
@@ -691,37 +775,7 @@ formatNPR(product.originalPrice)}
 >Details</button>                      <button className="btn-whatsapp" onClick={
 () => setWhatsappConfirm(product)}
 ><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Z"/></svg> Inquire</button>                    </div>                  </div>                </div>              ))}
-            </div>          </div>        </section>        {
-/* CATEGORIES SECTION */}
-        <section id="categories" className="categories-section">          <div className="container">            <div className="section-header">              <h2>Shop by Category</h2>              <p>Browse our organized product categories</p>            </div>            <div className="categories-grid">              {
-Object.values(PRODUCT_CATEGORIES).map((category) => (                <button                  key={
-category.id}
-                  className={
-`category-card ${selectedCategory === category.name ? 'active' : ''}`
-}
-                  onClick={
-() => {
-                    setSelectedCategory(selectedCategory === category.name ? 'All' : category.name)
-                    document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                  }
-}
-                >                  <span className="category-icon">{
-category.icon}
-</span>                  <span className="category-name">{
-category.name}
-</span>                </button>              ))}
-              <button                className={
-`category-card ${selectedCategory === 'All' ? 'active' : ''}`
-}
-                onClick={
-() => {
-                  setSelectedCategory('All')
-                  document.getElementById('shop').scrollIntoView({
- behavior: 'smooth' }
-)                }
-}
-              >                <span className="category-icon">🔍</span>                <span className="category-name">All Products</span>              </button>            </div>          </div>        </section>        {
+            </div>          </div>        </section>                {
 /* SHOP / PRODUCTS SECTION */}
         <section id="shop" className="shop-section">          <div className="container">            <div className="shop-header">              <h2>Our Complete Catalog</h2>              <div className="shop-controls">                <select value={
 selectedBrand}
@@ -891,5 +945,13 @@ formatNPR(whatsappConfirm.price)}
                 >                  Continue to WhatsApp                </button>                <button                   className="btn-secondary"                   onClick={
 () => setWhatsappConfirm(null)}
                 >                  Cancel                </button>              </div>            </div>          </div>        </div>      )}
+      <AiChat
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        products={products}
+        getProductImage={getProductImage}
+        formatNPR={formatNPR}
+        onSelectProduct={setSelectedProduct}
+      />
       </div>  )}
 export default App
