@@ -139,6 +139,37 @@
   .toast.ok { background:var(--success); }
   .toast.err { background:var(--danger); }
 
+  /* ---------- Brand management ---------- */
+  .brand-manager { display:none; }
+  .brand-manager.active { display:block; animation:fadeIn .2s ease; }
+  .brand-manager-head { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+  .brand-manager-head h3 { font-size:1.15rem; color:var(--text); }
+  .brand-add-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .brand-add-row input { flex:1; min-width:180px; }
+  .brand-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .brand-manage-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-sm); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .brand-manage-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:#d3e5ff; }
+  .brand-avatar { width:52px; height:52px; border-radius:12px; background:linear-gradient(135deg,#eef2f8,#e0e9ff); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; font-size:1.5rem; font-weight:800; color:var(--primary); }
+  .brand-avatar img { width:100%; height:100%; object-fit:contain; padding:6px; }
+  .brand-manage-info { flex:1; min-width:0; }
+  .brand-manage-info strong { display:block; font-size:.98rem; color:var(--text); }
+  .brand-manage-info .brand-id { font-size:.72rem; color:var(--muted); }
+  .brand-manage-actions { display:flex; gap:7px; flex-shrink:0; }
+  .brand-count-chip { display:inline-block; margin-top:6px; padding:2px 10px; border-radius:999px; background:var(--primary-50,#eff6ff); color:var(--primary); font-size:.72rem; font-weight:800; }
+
+  .brand-delete-warn { display:none; }
+  .brand-delete-warn.show { display:block; margin-top:12px; }
+  .brand-delete-count { font-weight:700; color:var(--danger); }
+
+  @media (max-width:760px) {
+    .form-grid { grid-template-columns:1fr; }
+    .stats { width:100%; margin-left:0; }
+    .cards-grid { grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; }
+    .pc-img { height:160px; }
+    thead th:nth-child(4), thead th:nth-child(5), tbody td:nth-child(4), tbody td:nth-child(5) { display:none; }
+    .brand-grid { grid-template-columns:1fr; }
+  }
+
   /* ---------- Login gate ---------- */
   .login-gate { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:18px; background:linear-gradient(135deg,#0b1f3d,#1e3a8a); }
   .login-gate.hidden { display:none; }
@@ -197,6 +228,7 @@
   <div class="tabs">
     <button class="tab active" id="tabCards" onclick="setView('cards')">🖼 Catalog</button>
     <button class="tab" id="tabTable" onclick="setView('table')">🗂 Manage List</button>
+    <button class="tab" id="tabBrands" onclick="setView('brands')">🏷️ Brands</button>
   </div>
 
   <div class="toolbar">
@@ -241,6 +273,22 @@
       </table>
     </div>
   </div>
+
+  <!-- Brand management view -->
+  <div class="brand-manager" id="viewBrands">
+    <div class="brand-manager-head">
+      <h3>🏷️ Brand Management</h3>
+      <div class="brand-add-row">
+        <input type="text" id="brandNewName" placeholder="New brand name (e.g. Panasonic)">
+        <input type="text" id="brandNewLogo" placeholder="Logo URL (optional)">
+        <button class="btn btn-primary" onclick="addBrand()">＋ Add Brand</button>
+      </div>
+    </div>
+    <div class="hint">
+      Brands added here appear automatically in the <b>Brand</b> dropdown when adding/editing products, and in the <b>brand filter</b> on the customer website. Deleting a brand will not delete its products; those products will simply keep showing their brand name.
+    </div>
+    <div id="brandsGrid" class="brand-grid"></div>
+  </div>
 </div>
 
 <!-- Product form modal -->
@@ -256,8 +304,7 @@
           <input type="text" id="f-name" placeholder="e.g. Samsung 43&quot; Smart TV">
         </label>
         <label>Brand
-          <input type="text" id="f-brand" list="dl-brand" placeholder="e.g. Samsung">
-          <datalist id="dl-brand"></datalist>
+          <select id="f-brand"></select>
         </label>
         <label>Category *
           <input type="text" id="f-category" list="dl-cat" placeholder="e.g. Television">
@@ -459,6 +506,144 @@ let products = []
 let editingId = null
 let photoData = []
 let currentView = 'cards'
+let brands = []
+const BRANDS_STORAGE_KEY = 'panchakanya-brands'
+
+// ---------------------------------------------------------------- brand load / save
+function loadBrands() {
+  try {
+    const raw = localStorage.getItem(BRANDS_STORAGE_KEY)
+    brands = raw ? JSON.parse(raw) : []
+  } catch (e) { brands = [] }
+  if (!Array.isArray(brands)) brands = []
+  if (!brands.length) {
+    brands = [
+      { id: 1, name: 'Better', logo: '/Better.png' },
+      { id: 2, name: 'Crompton', logo: '/Crompton.png' },
+      { id: 3, name: 'CG', logo: '/CG.jpg' },
+      { id: 4, name: 'LG', logo: '/LG-Logo.jpg' },
+      { id: 5, name: 'Samsung', logo: '/Samsung.jpg' }
+    ]
+    saveBrands()
+  }
+}
+
+function saveBrands() {
+  localStorage.setItem(BRANDS_STORAGE_KEY, JSON.stringify(brands))
+  renderBrands()
+}
+
+async function dbLoadBrands() {
+  if (!supabaseClient) return
+  try {
+    const { data, error } = await supabaseClient.from('brands').select('*').limit(1000)
+    if (error) throw error
+    if (data && data.length) {
+      brands = data.map(r => ({ id: r.id, name: r.name, logo: r.logo })).filter(b => (b.name || '').toLowerCase() !== 'baltra')
+      localStorage.setItem(BRANDS_STORAGE_KEY, JSON.stringify(brands))
+      renderBrands()
+      render()
+    } else if (brands.length) {
+      const seeds = brands.map(b => ({ name: b.name, logo: b.logo }))
+      const { error: insErr } = await supabaseClient.from('brands').insert(seeds)
+      if (insErr) throw insErr
+    }
+  } catch (err) {
+    console.warn('Supabase brands not reachable, using local:', err.message)
+  }
+}
+
+function brandCount(name) {
+  return products.filter(p => p.brand === name).length
+}
+
+function renderBrands() {
+  const grid = document.getElementById('brandsGrid')
+  if (!grid) return
+  if (!brands.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="big">🏷️</div>No brands yet. Add your first brand above.</div>'
+    return
+  }
+  grid.innerHTML = brands.map(b => {
+    const count = brandCount(b.name)
+    const logo = b.logo && b.logo !== '✨'
+      ? '<img src="' + escA(b.logo) + '" alt="">'
+      : b.name.charAt(0)
+    return '<div class="brand-manage-card">' +
+      '<div class="brand-avatar">' + logo + '</div>' +
+      '<div class="brand-manage-info">' +
+        '<strong>' + esc(b.name) + '</strong>' +
+        '<span class="brand-id">' + (count > 0 ? count + ' product' + (count > 1 ? 's' : '') : 'No products') + '</span>' +
+        (count > 0 ? '<span class="brand-count-chip">' + count + '</span>' : '') +
+      '</div>' +
+      '<div class="brand-manage-actions">' +
+        '<button class="btn btn-blue btn-sm" onclick="editBrand(' + escId(String(b.id)) + ')">✏</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="deleteBrand(' + escId(String(b.id)) + ')">🗑</button>' +
+      '</div>' +
+    '</div>'
+  }).join('')
+}
+
+function addBrand() {
+  const name = document.getElementById('brandNewName').value.trim()
+  const logo = document.getElementById('brandNewLogo').value.trim()
+  if (!name) { toast('Brand name is required', 'err'); document.getElementById('brandNewName').focus(); return }
+  if (new Set(brands.map(b => b.name.toLowerCase())).has(name.toLowerCase())) { toast('Brand "' + name + '" already exists', 'err'); return }
+  const brand = {
+    id: brands.length ? Math.max(...brands.map(b => b.id)) + 1 : 1,
+    name: name,
+    logo: logo || null
+  }
+  brands.push(brand)
+  saveBrands()
+  if (supabaseClient) supabaseClient.from('brands').insert({ name: name, logo: logo || null })
+    .then(({ error }) => { if (error) console.warn('Supabase brand insert failed:', error.message) })
+  document.getElementById('brandNewName').value = ''
+  document.getElementById('brandNewLogo').value = ''
+  render()
+  toast('Brand "' + name + '" added', 'ok')
+}
+
+function editBrand(id) {
+  const b = brands.find(x => String(x.id) === String(id))
+  if (!b) return
+  const newName = prompt('Rename brand "' + b.name + '":', b.name)
+  if (newName === null) return
+  const trimmed = newName.trim()
+  if (!trimmed) { toast('Brand name cannot be empty', 'err'); return }
+  if (trimmed.toLowerCase() !== b.name.toLowerCase() && new Set(brands.map(x => x.name.toLowerCase())).has(trimmed.toLowerCase())) {
+    toast('Brand "' + trimmed + '" already exists', 'err'); return
+  }
+  const oldName = b.name
+  b.name = trimmed
+  products.forEach(p => { if (p.brand === oldName) p.brand = trimmed })
+  saveProducts()
+  saveBrands()
+  if (supabaseClient) {
+    supabaseClient.from('brands').update({ name: trimmed }).eq('id', b.id)
+      .then(({ error }) => { if (error) console.warn('Supabase brand update failed:', error.message) })
+    const affected = products.filter(p => p.brand === trimmed)
+    if (affected.length) supabaseClient.from('products').upsert(affected.map(productToRow))
+      .then(({ error }) => { if (error) console.warn('Supabase product brand update failed:', error.message) })
+  }
+  render()
+  toast('Brand renamed to "' + trimmed + '"', 'ok')
+}
+
+function deleteBrand(id) {
+  const b = brands.find(x => String(x.id) === String(id))
+  if (!b) return
+  const count = brandCount(b.name)
+  let msg = 'Delete brand "' + b.name + '"?'
+  if (count > 0) msg += '\n\nThis brand is used by ' + count + ' product(s). Those products will NOT be deleted; they will keep showing "' + b.name + '" as their brand.'
+  if (!confirm(msg)) return
+  brands = brands.filter(x => x.id !== b.id)
+  saveBrands()
+  if (supabaseClient) supabaseClient.from('brands').delete().eq('id', b.id)
+    .then(({ error }) => { if (error) console.warn('Supabase brand delete failed:', error.message) })
+  render()
+  toast('Brand "' + b.name + '" deleted')
+}
 
 // ---------------------------------------------------------------- load / save
 function loadProducts() {
@@ -548,8 +733,11 @@ function setView(v) {
   currentView = v
   document.getElementById('tabCards').className = 'tab' + (v === 'cards' ? ' active' : '')
   document.getElementById('tabTable').className = 'tab' + (v === 'table' ? ' active' : '')
+  document.getElementById('tabBrands').className = 'tab' + (v === 'brands' ? ' active' : '')
   document.getElementById('viewCards').style.display = v === 'cards' ? '' : 'none'
   document.getElementById('viewTable').style.display = v === 'table' ? '' : 'none'
+  document.getElementById('viewBrands').classList.toggle('active', v === 'brands')
+  if (v === 'brands') renderBrands()
   render()
 }
 
@@ -561,8 +749,9 @@ function render() {
   const sort = document.getElementById('sortBy').value
 
   // populate filter dropdowns
-  const cats = new Set(), brands = new Set(), groups = new Set()
-  products.forEach(p => { if (p.category) cats.add(p.category); if (p.categoryGroup) groups.add(p.categoryGroup); if (p.brand) brands.add(p.brand) })
+  const cats = new Set(), brandSet = new Set(), groups = new Set()
+  products.forEach(p => { if (p.category) cats.add(p.category); if (p.categoryGroup) groups.add(p.categoryGroup); if (p.brand) brandSet.add(p.brand) })
+  ;(brands || []).forEach(b => { if (b && b.name) brandSet.add(b.name) })
 
   let catOpts = '<option value="">All categories</option>'
   ;[...cats].sort().forEach(c => catOpts += '<option value="' + escA(c) + '"' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>')
@@ -570,12 +759,18 @@ function render() {
   document.getElementById('catFilter').innerHTML = catOpts
 
   let brandOpts = '<option value="">All brands</option>'
-  ;[...brands].sort().forEach(b => brandOpts += '<option value="' + escA(b) + '"' + (b === brand ? ' selected' : '') + '>' + esc(b) + '</option>')
+  ;[...brandSet].sort().forEach(b => brandOpts += '<option value="' + escA(b) + '"' + (b === brand ? ' selected' : '') + '>' + esc(b) + '</option>')
   document.getElementById('brandFilter').innerHTML = brandOpts
 
-  const dlB = document.getElementById('dl-brand'), dlC = document.getElementById('dl-cat'), dlG = document.getElementById('dl-catgroup')
+  // Brand dropdown for add/edit product form
+  const fBrand = document.getElementById('f-brand')
+  let fBrandOpts = '<option value="">— Select brand —</option>'
+  ;[...brandSet].sort().forEach(b => fBrandOpts += '<option value="' + escA(b) + '">' + esc(b) + '</option>')
+  fBrand.innerHTML = fBrandOpts
+
+  const dlC = document.getElementById('dl-cat'), dlG = document.getElementById('dl-catgroup')
   const opts = (s) => [...s].map(x => '<option value="' + escA(x) + '"></option>').join('')
-  dlB.innerHTML = opts(brands); dlC.innerHTML = opts(cats); dlG.innerHTML = opts(groups)
+  dlC.innerHTML = opts(cats); dlG.innerHTML = opts(groups)
 
   let rows = products.filter(p =>
     (!cat || p.category === cat || p.categoryGroup === cat) &&
@@ -865,8 +1060,10 @@ function importJson(e) {
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeForm() })
 if (loginOk()) document.getElementById('loginGate').classList.add('hidden')
 loadProducts()
+loadBrands()
 render()
 dbLoad()
+dbLoadBrands()
 </script>
 </body>
 </html>

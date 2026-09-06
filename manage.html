@@ -4,106 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Manager - Panchakanya Electric Emporium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --blue: #1e5fbf;
-    --blue-dark: #164a96;
-    --green: #13942b;
-    --red: #d63a3a;
-    --bg: #f2f5f9;
-    --card: #ffffff;
-    --border: #dde3ec;
-    --text: #202a37;
-    --muted: #6b7787;
+    --primary: #2563eb; --primary-dark: #1d4ed8; --primary-700: #1e40af;
+    --accent: #f97316; --whats: #25d366; --success: #16a34a; --danger: #dc2626;
+    --surface: #fff; --bg: #f6f8fb; --text: #0f172a; --muted: #5f6f85; --border: #e5eaf2;
+    --navy: #0b1f3d; --navy-2: #122c52;
+    --shadow-sm: 0 2px 6px rgba(15,23,42,.06);
+    --shadow: 0 6px 18px rgba(15,23,42,.08); --shadow-md: 0 12px 30px rgba(15,23,42,.12);
+    --shadow-lg: 0 20px 48px rgba(15,23,42,.18); --radius: 16px; --radius-sm: 10px;
   }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--text); }
-  .topbar { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .topbar h1 { font-size: 19px; font-weight: 600; }
-  .topbar h1 small { display: block; font-size: 12px; font-weight: 400; opacity: .85; }
+  body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: var(--primary); text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .topbar { position: sticky; top: 0; z-index: 60; background: linear-gradient(135deg, #1e3a8a, #0b1f3d); color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; box-shadow: 0 12px 30px rgba(15,23,42,.12); }
+  .topbar h1 { font-size: 19px; font-weight: 800; }
+  .topbar h1 small { display: block; font-size: 12px; font-weight: 400; opacity: .8; }
   .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .btn { border: none; border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .05s ease, box-shadow .15s ease; }
-  .btn:active { transform: scale(.97); }
-  .btn-primary { background: var(--green); color: #fff; }
-  .btn-primary:hover { background: #0f7d24; }
-  .btn-blue { background: var(--blue); color: #fff; }
-  .btn-blue:hover { background: var(--blue-dark); }
+  .btn { border: none; border-radius: 10px; padding: 9px 15px; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s ease, box-shadow .2s ease, filter .2s ease; }
+  .btn:active { transform: scale(.96); }
+  .btn-primary { background: var(--success); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(22,163,74,.4); }
+  .btn-blue { background: var(--primary); color: #fff; }
+  .btn-blue:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37,99,235,.4); }
   .btn-ghost { background: rgba(255,255,255,.16); color: #fff; }
   .btn-ghost:hover { background: rgba(255,255,255,.28); }
-  .btn-outline { background: #fff; color: var(--blue); border: 1px solid var(--blue); }
-  .btn-outline:hover { background: #eef4ff; }
-  .btn-danger { background: var(--red); color: #fff; }
-  .btn-danger:hover { background: #bd2f2f; }
-  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+  .btn-outline:hover { background: #eff6ff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { filter: brightness(1.08); }
+  .btn-sm { padding: 6px 11px; font-size: 12px; border-radius: 8px; }
   .wrap { max-width: 1160px; margin: 0 auto; padding: 18px 16px 60px; }
   .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-  .toolbar input[type="search"], .toolbar select { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; }
+  .toolbar input[type="search"], .toolbar select { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: #fff; transition: border-color .2s ease, box-shadow .2s ease; }
   .toolbar input[type="search"] { flex: 1; min-width: 180px; }
+  .toolbar input:focus, .toolbar select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
   .stats { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .usage { height: 5px; background: #e3e9f1; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-  .usage div { height: 100%; background: linear-gradient(90deg, var(--green), #59c06a); width: 0%; }
+  .usage div { height: 100%; background: linear-gradient(90deg, var(--success), #59c06a); width: 0%; }
   .usage.warn div { background: #e0862f; }
-  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { text-align: left; padding: 11px 12px; background: #eef2f8; color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .02em; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  tbody td { padding: 10px 12px; border-bottom: 1px solid #eef1f6; vertical-align: middle; }
+  thead th { text-align: left; padding: 12px; background: #eef2f8; color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody td { padding: 11px 12px; border-bottom: 1px solid #eef1f6; vertical-align: middle; }
   tbody tr:hover { background: #f7faff; }
-  .thumb { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; background: #eef1f6; border: 1px solid var(--border); }
+  .thumb { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; background: #eef1f6; border: 1px solid var(--border); }
   .thumb.placeholder { display: flex; align-items: center; justify-content: center; color: #aab4c2; font-size: 18px; }
   .name-cell strong { display: block; font-size: 13px; }
   .name-cell span { color: var(--muted); font-size: 11px; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; margin: 1px 2px; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; margin: 1px 2px; }
   .badge.stock-out { background: #fde8e8; color: #b81d1d; }
   .badge.stock-in { background: #e4f6e7; color: #118a27; }
   .badge.new { background: #ffe9c7; color: #a35a00; }
-  .badge.feat { background: #e3edff; color: var(--blue); }
+  .badge.feat { background: #e3edff; color: var(--primary); }
   .actions { white-space: nowrap; }
   .empty { text-align: center; padding: 46px 20px; color: var(--muted); }
   .empty .big { font-size: 34px; margin-bottom: 8px; }
 
   /* Modal form */
-  .overlay { position: fixed; inset: 0; background: rgba(15, 25, 40, .5); display: none; align-items: flex-start; justify-content: center; padding: 30px 14px; overflow-y: auto; z-index: 50; }
-  .overlay.open { display: flex; }
-  .modal { background: #fff; border-radius: 14px; width: 100%; max-width: 720px; overflow: hidden; }
-  .modal-head { background: var(--blue); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
-  .modal-head h2 { font-size: 16px; font-weight: 600; }
-  .modal-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; line-height: 1; }
+  .overlay { position: fixed; inset: 0; background: rgba(11,31,61,.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: none; align-items: flex-start; justify-content: center; padding: 28px 14px; overflow-y: auto; z-index: 80; }
+  .overlay.open { display: flex; animation: fadeIn .2s ease; }
+  .modal { background: #fff; border-radius: var(--radius); width: 100%; max-width: 720px; overflow: hidden; box-shadow: var(--shadow-lg); animation: popIn .28s cubic-bezier(.34,1.56,.64,1); }
+  .modal-head { background: linear-gradient(135deg,#1e3a8a,#2563eb); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-size: 16px; font-weight: 800; }
+  .modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
   .modal-body { padding: 18px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .form-grid .full { grid-column: 1 / -1; }
-  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
   input[type="text"], input[type="number"], input[type="search"], textarea, select {
-    width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff;
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; background: #fff;
   }
-  input:focus, textarea:focus { outline: 2px solid #bcd4f7; border-color: var(--blue); }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
   textarea { resize: vertical; min-height: 60px; }
   .checks { display: flex; gap: 14px; flex-wrap: wrap; }
-  .checks label { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text); font-size: 13px; margin: 0; }
+  .checks label { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text); font-size: 13px; margin: 0; }
   .checks input { width: auto; }
 
   .specs-rows .spec-row { display: flex; gap: 8px; margin-bottom: 7px; }
   .spec-row input:first-child { flex: 0 0 38%; }
-  .icon-btn { border: 1px solid var(--border); background: #fff; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 14px; color: var(--red); flex-shrink: 0; }
+  .icon-btn { border: 1px solid var(--border); background: #fff; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 14px; color: var(--danger); flex-shrink: 0; }
   .icon-btn:hover { background: #fdecec; border-color: #e8b6b6; }
 
-  .add-spec { color: var(--blue); background: #eef4ff; border: 1px dashed var(--blue); border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .add-spec { color: var(--primary); background: #eef4ff; border: 1px dashed var(--primary); border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
   .add-spec:hover { background: #e0edff; }
 
   .photos { display: flex; flex-wrap: wrap; gap: 10px; }
   .photo { position: relative; width: 84px; height: 84px; }
   .photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); }
-  .photo button { position: absolute; top: -7px; right: -7px; width: 21px; height: 21px; border-radius: 50%; border: 2px solid #fff; background: var(--red); color: #fff; font-size: 11px; cursor: pointer; line-height: 1; }
+  .photo button { position: absolute; top: -7px; right: -7px; width: 21px; height: 21px; border-radius: 50%; border: 2px solid #fff; background: var(--danger); color: #fff; font-size: 11px; cursor: pointer; line-height: 1; }
   .drop { border: 2px dashed var(--border); border-radius: 9px; width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; color: #aab4c2; font-size: 11px; text-align: center; cursor: pointer; background: #fafcff; }
-  .drop:hover { border-color: var(--blue); color: var(--blue); }
+  .drop:hover { border-color: var(--primary); color: var(--primary); }
 
   .modal-foot { display: flex; gap: 10px; justify-content: flex-end; padding: 14px 18px; border-top: 1px solid #eef1f6; background: #fafcff; }
 
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: #223; color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s ease; z-index: 99; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(90px); background: #0b1f3d; color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 13px; font-weight: 700; opacity: 0; transition: all .25s ease; z-index: 99; box-shadow: var(--shadow-lg); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.ok { background: var(--green); }
-  .toast.err { background: var(--red); }
+  .toast.ok { background: var(--success); }
+  .toast.err { background: var(--danger); }
 
-  .hint { background: #eef4ff; border: 1px solid #cddffc; color: var(--blue-dark); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 14px 0; line-height: 1.55; }
+  /* ---------- Brand management ---------- */
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab { padding: 9px 18px; border-radius: 999px; border: 1px solid var(--border); background: #fff; font-weight: 700; font-size: .9rem; color: var(--muted); cursor: pointer; transition: all .2s ease; }
+  .tab.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 6px 14px rgba(37,99,235,.3); }
+  .tab:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+  .brand-manager { display: none; }
+  .brand-manager.active { display: block; animation: fadeIn .2s ease; }
+  .brand-manager-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .brand-manager-head h3 { font-size: 1.15rem; color: var(--text); }
+  .brand-add-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .brand-add-row input { flex: 1; min-width: 180px; }
+  .brand-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+  .brand-manage-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 6px rgba(15,23,42,.06); transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .brand-manage-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(15,23,42,.12); border-color: #c7d9f5; }
+  .brand-avatar { width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg,#eef2f8,#e0e9ff); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+  .brand-avatar img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+  .brand-manage-info { flex: 1; min-width: 0; }
+  .brand-manage-info strong { display: block; font-size: .98rem; color: var(--text); }
+  .brand-manage-info .brand-id { font-size: .72rem; color: var(--muted); }
+  .brand-manage-actions { display: flex; gap: 7px; flex-shrink: 0; }
+  .brand-count-chip { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px; background: #eef4ff; color: var(--primary); font-size: .72rem; font-weight: 700; }
+
+  @media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .stats { width: 100%; margin-left: 0; }
+    thead th:nth-child(4), thead th:nth-child(5), tbody td:nth-child(4), tbody td:nth-child(5) { display: none; }
+    .brand-grid { grid-template-columns: 1fr; }
+  }
+
+  .hint { background: #eff6ff; border: 1px solid #c7ddfc; color: #1e3a8a; border-radius: 12px; padding: 13px 16px; font-size: 13px; margin: 14px 0; line-height: 1.6; }
   .hint code { background: #fff; padding: 1px 6px; border-radius: 5px; font-size: 12px; }
 
   @media (max-width: 700px) {
@@ -112,19 +146,22 @@
     thead th:nth-child(4), thead th:nth-child(5), tbody td:nth-child(4), tbody td:nth-child(5) { display: none; }
   }
 
-  .login-gate { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 18px; background: linear-gradient(135deg, #0b1f3d, #164a96); }
+  .login-gate { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 18px; background: linear-gradient(135deg, #0b1f3d, #1e3a8a); }
   .login-gate.hidden { display: none; }
-  .login-card { width: 100%; max-width: 400px; background: #fff; border-radius: 20px; padding: 30px 28px; box-shadow: 0 20px 48px rgba(11,31,61,.35); text-align: center; }
-  .login-logo { width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 18px; background: linear-gradient(135deg, var(--blue), var(--blue-dark)); display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 24px rgba(30,95,191,.35); }
-  .login-card h2 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .login-card { width: 100%; max-width: 400px; background: #fff; border-radius: 20px; padding: 30px 28px; box-shadow: var(--shadow-lg); text-align: center; animation: popIn .3s cubic-bezier(.34,1.56,.64,1); }
+  .login-logo { width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 18px; background: linear-gradient(135deg, var(--primary), #1e3a8a); display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 24px rgba(37,99,235,.35); }
+  .login-card h2 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
   .login-card p { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
-  .login-card input { width: 100%; padding: 12px 14px; border: 1px solid #dde3ec; border-radius: 11px; font-size: 14px; margin-bottom: 11px; font-family: inherit; background: #fff; }
-  .login-card input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(30,95,191,.12); }
-  .login-error { color: var(--red); font-size: 12.5px; font-weight: 700; margin: -4px 0 10px; display: none; }
-  .login-btn { width: 100%; padding: 12px; border: none; border-radius: 11px; background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s ease; font-family: inherit; }
-  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(30,95,191,.4); }
+  .login-card input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 11px; font-size: 14px; margin-bottom: 11px; font-family: inherit; background: #fff; }
+  .login-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+  .login-error { color: var(--danger); font-size: 12.5px; font-weight: 700; margin: -4px 0 10px; display: none; }
+  .login-btn { width: 100%; padding: 12px; border: none; border-radius: 11px; background: linear-gradient(135deg, var(--primary), #1e3a8a); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; transition: all .2s ease; font-family: inherit; }
+  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(37,99,235,.4); }
   .login-btn:active { transform: scale(.98); }
   .login-note { margin-top: 14px; font-size: 11.5px; color: #aab4c2; }
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes popIn { from{opacity:0;transform:scale(.92) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
 </style>
 </head>
 <body>
@@ -154,6 +191,12 @@
 </div>
 
 <div class="wrap">
+  <div class="tabs">
+    <button class="tab active" id="tabProducts" onclick="setView('products')">📦 Products</button>
+    <button class="tab" id="tabBrands" onclick="setView('brands')">🏷️ Brands</button>
+  </div>
+
+  <div id="viewProducts">
   <div class="toolbar">
     <input type="search" id="search" placeholder="🔍 &nbsp;Search name, brand, model, category..." oninput="render()">
     <select id="catFilter" onchange="render()"><option value="">All categories</option></select>
@@ -181,6 +224,23 @@
       </tbody>
     </table>
   </div>
+  </div>
+
+  <!-- Brand management view -->
+  <div class="brand-manager" id="viewBrands">
+    <div class="brand-manager-head">
+      <h3>🏷️ Brand Management</h3>
+      <div class="brand-add-row">
+        <input type="text" id="brandNewName" placeholder="New brand name (e.g. Panasonic)">
+        <input type="text" id="brandNewLogo" placeholder="Logo URL (optional)">
+        <button class="btn btn-primary" onclick="addBrand()">＋ Add Brand</button>
+      </div>
+    </div>
+    <div class="hint">
+      Brands added here appear automatically in the <b>Brand</b> dropdown when adding/editing products, and in the <b>brand filter</b> on the customer website. Deleting a brand will not delete its products; those products will simply keep showing their brand name.
+    </div>
+    <div id="brandsGrid" class="brand-grid"></div>
+  </div>
 </div>
 
 <!-- Product form modal -->
@@ -196,8 +256,7 @@
           <input type="text" id="f-name" placeholder="e.g. Samsung 43&quot; Smart TV">
         </label>
         <label>Brand
-          <input type="text" id="f-brand" list="dl-brand" placeholder="e.g. Samsung">
-          <datalist id="dl-brand"></datalist>
+          <select id="f-brand"></select>
         </label>
         <label>Model
           <input type="text" id="f-model" placeholder="e.g. UA43T">
@@ -399,6 +458,154 @@ function sha256(ascii) {
 let products = []
 let editingId = null
 let photoData = []   // current photo list (data URLs or paths) for the open form
+let brands = []
+let currentView = 'products'
+const BRANDS_STORAGE_KEY = 'panchakanya-brands'
+
+// ---------------------------------------------------------------- brand management
+function loadBrands() {
+  try {
+    const raw = localStorage.getItem(BRANDS_STORAGE_KEY)
+    brands = raw ? JSON.parse(raw) : []
+  } catch (e) { brands = [] }
+  if (!Array.isArray(brands)) brands = []
+  if (!brands.length) {
+    brands = [
+      { id: 1, name: 'Better', logo: '/Better.png' },
+      { id: 2, name: 'Crompton', logo: '/Crompton.png' },
+      { id: 3, name: 'CG', logo: '/CG.jpg' },
+      { id: 4, name: 'LG', logo: '/LG-Logo.jpg' },
+      { id: 5, name: 'Samsung', logo: '/Samsung.jpg' }
+    ]
+    saveBrands()
+  }
+}
+
+function saveBrands() {
+  localStorage.setItem(BRANDS_STORAGE_KEY, JSON.stringify(brands))
+  renderBrands()
+}
+
+async function dbLoadBrands() {
+  if (!supabaseClient) return
+  try {
+    const { data, error } = await supabaseClient.from('brands').select('*').limit(1000)
+    if (error) throw error
+    if (data && data.length) {
+      brands = data.map(r => ({ id: r.id, name: r.name, logo: r.logo })).filter(b => (b.name || '').toLowerCase() !== 'baltra')
+      localStorage.setItem(BRANDS_STORAGE_KEY, JSON.stringify(brands))
+      renderBrands()
+      render()
+    } else if (brands.length) {
+      const seeds = brands.map(b => ({ name: b.name, logo: b.logo }))
+      const { error: insErr } = await supabaseClient.from('brands').insert(seeds)
+      if (insErr) throw insErr
+    }
+  } catch (err) {
+    console.warn('Supabase brands not reachable, using local:', err.message)
+  }
+}
+
+function brandCount(name) {
+  return products.filter(p => p.brand === name).length
+}
+
+function renderBrands() {
+  const grid = document.getElementById('brandsGrid')
+  if (!grid) return
+  if (!brands.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="big">🏷️</div>No brands yet. Add your first brand above.</div>'
+    return
+  }
+  grid.innerHTML = brands.map(b => {
+    const count = brandCount(b.name)
+    const logo = b.logo && b.logo !== '✨'
+      ? '<img src="' + esc(b.logo).replace(/"/g, '&quot;') + '" alt="">'
+      : b.name.charAt(0)
+    return '<div class="brand-manage-card">' +
+      '<div class="brand-avatar">' + logo + '</div>' +
+      '<div class="brand-manage-info">' +
+        '<strong>' + esc(b.name) + '</strong>' +
+        '<span class="brand-id">' + (count > 0 ? count + ' product' + (count > 1 ? 's' : '') : 'No products') + '</span>' +
+        (count > 0 ? '<span class="brand-count-chip">' + count + '</span>' : '') +
+      '</div>' +
+      '<div class="brand-manage-actions">' +
+        '<button class="btn btn-blue btn-sm" onclick="editBrand(' + escId(String(b.id)) + ')">✏</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="deleteBrand(' + escId(String(b.id)) + ')">🗑</button>' +
+      '</div>' +
+    '</div>'
+  }).join('')
+}
+
+function setView(v) {
+  currentView = v
+  document.getElementById('tabProducts').className = 'tab' + (v === 'products' ? ' active' : '')
+  document.getElementById('tabBrands').className = 'tab' + (v === 'brands' ? ' active' : '')
+  document.getElementById('viewProducts').style.display = v === 'products' ? '' : 'none'
+  document.getElementById('viewBrands').classList.toggle('active', v === 'brands')
+  if (v === 'brands') renderBrands()
+}
+
+function addBrand() {
+  const name = document.getElementById('brandNewName').value.trim()
+  const logo = document.getElementById('brandNewLogo').value.trim()
+  if (!name) { toast('Brand name is required', 'err'); document.getElementById('brandNewName').focus(); return }
+  if (new Set(brands.map(b => b.name.toLowerCase())).has(name.toLowerCase())) { toast('Brand "' + name + '" already exists', 'err'); return }
+  const brand = {
+    id: brands.length ? Math.max(...brands.map(b => b.id)) + 1 : 1,
+    name: name,
+    logo: logo || null
+  }
+  brands.push(brand)
+  saveBrands()
+  if (supabaseClient) supabaseClient.from('brands').insert({ name: name, logo: logo || null })
+    .then(({ error }) => { if (error) console.warn('Supabase brand insert failed:', error.message) })
+  document.getElementById('brandNewName').value = ''
+  document.getElementById('brandNewLogo').value = ''
+  render()
+  toast('Brand "' + name + '" added', 'ok')
+}
+
+function editBrand(id) {
+  const b = brands.find(x => String(x.id) === String(id))
+  if (!b) return
+  const newName = prompt('Rename brand "' + b.name + '":', b.name)
+  if (newName === null) return
+  const trimmed = newName.trim()
+  if (!trimmed) { toast('Brand name cannot be empty', 'err'); return }
+  if (trimmed.toLowerCase() !== b.name.toLowerCase() && new Set(brands.map(x => x.name.toLowerCase())).has(trimmed.toLowerCase())) {
+    toast('Brand "' + trimmed + '" already exists', 'err'); return
+  }
+  const oldName = b.name
+  b.name = trimmed
+  products.forEach(p => { if (p.brand === oldName) p.brand = trimmed })
+  saveProducts()
+  saveBrands()
+  if (supabaseClient) {
+    supabaseClient.from('brands').update({ name: trimmed }).eq('id', b.id)
+      .then(({ error }) => { if (error) console.warn('Supabase brand update failed:', error.message) })
+    const affected = products.filter(p => p.brand === trimmed)
+    if (affected.length) supabaseClient.from('products').upsert(affected.map(productToRow))
+      .then(({ error }) => { if (error) console.warn('Supabase product brand update failed:', error.message) })
+  }
+  render()
+  toast('Brand renamed to "' + trimmed + '"', 'ok')
+}
+
+function deleteBrand(id) {
+  const b = brands.find(x => String(x.id) === String(id))
+  if (!b) return
+  const count = brandCount(b.name)
+  let msg = 'Delete brand "' + b.name + '"?'
+  if (count > 0) msg += '\n\nThis brand is used by ' + count + ' product(s). Those products will NOT be deleted; they will keep showing "' + b.name + '" as their brand.'
+  if (!confirm(msg)) return
+  brands = brands.filter(x => x.id !== b.id)
+  saveBrands()
+  if (supabaseClient) supabaseClient.from('brands').delete().eq('id', b.id)
+    .then(({ error }) => { if (error) console.warn('Supabase brand delete failed:', error.message) })
+  render()
+  toast('Brand "' + b.name + '" deleted')
+}
 
 // ---------------------------------------------------------------- load / save
 function loadProducts() {
@@ -470,19 +677,25 @@ function newId() {
 function render() {
   const term = (document.getElementById('search').value || '').toLowerCase().trim()
   const cat = document.getElementById('catFilter').value
-  const brands = new Set(), cats = new Set(), groups = new Set()
-  products.forEach(p => { if (p.brand) brands.add(p.brand); if (p.category) cats.add(p.category); if (p.categoryGroup) groups.add(p.categoryGroup) })
+  const brandSet = new Set(), cats = new Set(), groups = new Set()
+  products.forEach(p => { if (p.brand) brandSet.add(p.brand); if (p.category) cats.add(p.category); if (p.categoryGroup) groups.add(p.categoryGroup) })
+  ;(brands || []).forEach(b => { if (b && b.name) brandSet.add(b.name) })
 
   let options = '<option value="">All categories</option>'
   ;[...cats].sort().forEach(c => options += '<option' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>')
   ;[...groups].sort().forEach(g => options += '<option' + (g === cat ? ' selected' : '') + '>' + esc(g) + '</option>')
   document.getElementById('catFilter').innerHTML = options
 
-  const dlBrand = document.getElementById('dl-brand')
+  // Brand dropdown for add/edit product form
+  const fBrand = document.getElementById('f-brand')
+  let fBrandOpts = '<option value="">— Select brand —</option>'
+  ;[...brandSet].sort().forEach(b => fBrandOpts += '<option value="' + esc(b).replace(/"/g, '&quot;') + '">' + esc(b) + '</option>')
+  fBrand.innerHTML = fBrandOpts
+
   const dlCat = document.getElementById('dl-cat')
   const dlGroup = document.getElementById('dl-catgroup')
   const opts = (s) => [...s].map(x => '<option value="' + esc(x).replace(/"/g, '&quot;') + '"></option>').join('')
-  dlBrand.innerHTML = opts(brands); dlCat.innerHTML = opts(cats); dlGroup.innerHTML = opts(groups)
+  dlCat.innerHTML = opts(cats); dlGroup.innerHTML = opts(groups)
 
   const rows = products
     .filter(p => (!cat || p.category === cat || p.categoryGroup === cat) &&
@@ -742,8 +955,11 @@ document.addEventListener('keydown', (e) => {
 })
 if (loginOk()) document.getElementById('loginGate').classList.add('hidden')
 loadProducts()
+loadBrands()
 render()
 dbLoad()
+dbLoadBrands()
+setView('products')
 </script>
 </body>
 </html>
