@@ -132,7 +132,7 @@ export default function SearchBar({ products, getProductImage, formatNPR, onSele
           ref={inputRef}
           type="search"
           className="navbar-search"
-          placeholder="Search products, brands, categories..."
+          placeholder="Search for products..."
           value={input}
           onChange={(e) => {
             setInput(e.target.value)

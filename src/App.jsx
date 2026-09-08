@@ -24,78 +24,58 @@ const message = generateWhatsAppMessage(productName, productPrice, productModel)
 const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`
   window.open(waLink, '_blank')}
 // ============================================================================
-// PRODUCT CATEGORIES - ORGANIZED BY TYPE
+// HOME DROPDOWN MENU
 // ============================================================================
-const PRODUCT_CATEGORIES = {
-  'Kitchen Appliances': {
-    id: 'kitchen',    name: 'Kitchen Appliances',    icon: '🍳',    items: [      {
- id: 'kitchen-chimney', name: 'Kitchen Chimney' }
-,      {
- id: 'micro-oven', name: 'Micro Oven' }
-,      {
- id: 'rice-cooker', name: 'Rice Cooker' }
-,      {
- id: 'induction-cooktop', name: 'Induction Cooktops' }
-,      {
- id: 'refrigerator', name: 'Refrigerator' }
-,      {
- id: 'grinder-mixtures', name: 'Grinder and Mixtures' }
-,      {
- id: 'toaster', name: 'Toaster' }
-,    ],  }
-,  'Home Appliances': {
-    id: 'home',    name: 'Home Appliances',    icon: '🏠',    items: [      {
- id: 'washing-machine', name: 'Washing Machine' }
-,      {
- id: 'refrigerator', name: 'Refrigerator / Fridge' }
-,      {
- id: 'tv', name: 'Television' }
-,      {
- id: 'vacuum-cleaner', name: 'Vacuum Cleaner' }
-,      {
- id: 'iron', name: 'Iron' }
-,    ],  }
-,  'Air Conditioner': {
-    id: 'cooling',    name: 'Air Conditioner',    icon: '❄️',    items: [      {
- id: 'ac-1-ton', name: '1 Ton AC' }
-,      {
- id: 'ac-15-ton', name: '1.5 Ton AC' }
-,      {
- id: 'ac-2-ton', name: '2 Ton AC' }
-,    ],  }
-,  'Cooler': {
-    id: 'cooler',    name: 'Cooler',    icon: '💨',    items: [      {
- id: 'air-cooler', name: 'Air Cooler' }
-,    ],  }
-,  'Fans': {
-    id: 'fans',    name: 'Fans',    icon: '🌀',    items: [      {
- id: 'ceiling-fan', name: 'Ceiling Fan' }
-,      {
- id: 'stand-fan', name: 'Stand Fan' }
-,      {
- id: 'table-fan', name: 'Table Fan' }
-,      {
- id: 'wall-fan', name: 'Wall Fan' }
-,    ],  }
-,  'Electrical & Power': {
-    id: 'electrical',    name: 'Electrical & Power',    icon: '⚡',    items: [      {
- id: 'inverter', name: 'Inverter' }
-,      {
- id: 'battery', name: 'Battery' }
-,      {
- id: 'motor', name: 'Motor & Pumps' }
-,    ],  }
-,  'Lighting & Decor': {
-    id: 'lighting',    name: 'Lighting & Decor',    icon: '💡',    items: [      {
- id: 'chandelier', name: 'Chandelier' }
-,      {
- id: 'led-bulb', name: 'LED Bulb' }
-,      {
- id: 'led-tube', name: 'LED Tube Light' }
-,      {
- id: 'socket', name: 'Switch & Socket' }
-,    ],  }
-,}
+const HOME_MENU = [
+  {
+    title: 'Kitchen Appliances', group: 'Kitchen Appliances',
+    items: [
+      { name: 'Rice Cooker', filter: 'Electric Rice Cooker' },
+      { name: 'Electric Kettle', filter: 'Kitchen Appliances' },
+      { name: 'Blender', filter: 'Kitchen Appliances' },
+      { name: 'Mixer Grinder', filter: 'Grinder and Mixtures' },
+      { name: 'Induction Cooker', filter: 'Induction Stove' },
+      { name: 'Air Fryer', filter: 'Kitchen Appliances' },
+      { name: 'Microwave', filter: 'Micro Oven' },
+      { name: 'Coffee Maker', filter: 'Kitchen Appliances' },
+    ],
+  },
+  {
+    title: 'Home Appliances', group: 'Home Appliances',
+    items: [
+      { name: 'Refrigerator', filter: 'Refrigerator' },
+      { name: 'Washing Machine', filter: 'Washing Machine' },
+      { name: 'Vacuum Cleaner', filter: 'Vacuum Cleaner' },
+      { name: 'Iron', filter: 'Iron' },
+      { name: 'Water Dispenser', filter: 'Home Appliances' },
+      { name: 'Fans', filter: 'Fans' },
+      { name: 'Heaters', filter: 'Home Appliances' },
+    ],
+  },
+  {
+    title: 'Electric & Comfort', group: 'Electrical & Power',
+    items: [
+      { name: 'Fans', filter: 'Fans' },
+      { name: 'Room Heater', filter: 'Electrical & Power' },
+      { name: 'Air Cooler', filter: 'Air Cooler' },
+      { name: 'Electric Blanket', filter: 'Electrical & Power' },
+      { name: 'Extension Board', filter: 'Electrical & Power' },
+      { name: 'Lighting', filter: 'Lighting & Decor' },
+      { name: 'Chandeliers', filter: 'Chandelier' },
+    ],
+  },
+  {
+    title: 'Power Solutions', group: 'Electrical & Power',
+    items: [
+      { name: 'UPS', filter: 'Electrical & Power' },
+      { name: 'Inverter', filter: 'Inverter' },
+      { name: 'Stabilizer', filter: 'Electrical & Power' },
+      { name: 'Voltage Protector', filter: 'Electrical & Power' },
+      { name: 'Batteries', filter: 'Battery' },
+      { name: 'Solar Products', filter: 'Electrical & Power' },
+    ],
+  },
+]
 // ============================================================================
 // TRENDING CATEGORIES
 // ============================================================================
@@ -438,6 +418,8 @@ const [sortBy, setSortBy] = useState('featured')
   
 const [menuOpen, setMenuOpen] = useState(false)
   
+const [navScrolled, setNavScrolled] = useState(false)
+  
 const [selectedProduct, setSelectedProduct] = useState(null)
   
 const [whatsappConfirm, setWhatsappConfirm] = useState(null)  
@@ -501,8 +483,11 @@ const [brands, setBrands] = useState(() => {
   }, [])
 // Scroll-to-top visibility + modal handling
   useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 400)
-    window.addEventListener('scroll', onScroll)
+    const onScroll = () => {
+      setShowScrollTop(window.scrollY > 400)
+      setNavScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   // Scroll reveal animation
@@ -533,11 +518,8 @@ const [brands, setBrands] = useState(() => {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
-  // Cart state
-const [cartItems, setCartItems] = useState(() => persistedState('panchakanya-cart', []))
-// Mobile UI state
+  // Mobile UI state
 const [drawerOpen, setDrawerOpen] = useState(false)
-const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
 const [activeTab, setActiveTab] = useState('home')
 const [chatOpen, setChatOpen] = useState(false)
 // Scroll direction for search collapse
@@ -559,16 +541,27 @@ useEffect(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   return () => window.removeEventListener('scroll', onScroll)
 }, [])
-useEffect(() => { localStorage.setItem('panchakanya-cart', JSON.stringify(cartItems)) }, [cartItems])
   useEffect(() => {
-    const locked = !!(selectedProduct || whatsappConfirm || drawerOpen || cartDrawerOpen || chatOpen)
+    const locked = !!(selectedProduct || whatsappConfirm || drawerOpen || chatOpen || menuOpen)
     if (locked) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
     return () => { document.body.style.overflow = '' }
-  }, [selectedProduct, whatsappConfirm, drawerOpen, cartDrawerOpen, chatOpen])  
+  }, [selectedProduct, whatsappConfirm, drawerOpen, chatOpen, menuOpen])  
+// Close mobile menu on Escape or when switching to desktop
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
+    const onResize = () => { if (window.innerWidth > 768) setMenuOpen(false) }
+    document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [menuOpen])
 // ============================================================================
   
 // FILTERING & SORTING LOGIC
@@ -623,23 +616,7 @@ const resetFilters = () => {
     setSelectedCategory('All')
     setSearchTerm('')
     setSortBy('featured')  }
-// Cart helpers
-const cartCount = cartItems.reduce((s, i) => s + i.quantity, 0)
-const cartTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
-const addToCart = (product) => {
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i.id === product.id)
-      if (existing) return prev.map((i) => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      return [...prev, { id: product.id, name: product.name, price: product.price, image: (product.images && product.images[0]) || '', quantity: 1, brand: product.brand, model: product.model }]
-    })
-    setCartDrawerOpen(true)
-}
-const removeFromCart = (id) => setCartItems((prev) => prev.filter((i) => i.id !== id))
-const updateCartQty = (id, qty) => {
-    if (qty <= 0) return removeFromCart(id)
-    setCartItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity: qty } : i))
-}
-  
+
 // ============================================================================
   
 // RENDER - STORE VIEW
@@ -648,22 +625,22 @@ const updateCartQty = (id, qty) => {
   
 return (    <div className="app-shell">      {
 /* NAVBAR */}
-      <header className="navbar">        <div className="navbar-container">          <div className="navbar-brand">            <button className={`navbar-toggle ${menuOpen ? 'open' : ''}`} onClick={
+      <header className={`navbar navbar-2row ${navScrolled ? 'nav-scrolled' : ''}`}>
+        <div className="navbar-container navbar-row navbar-row-top">
+          <button className={`navbar-toggle ${menuOpen ? 'open' : ''}`} onClick={
 () => setMenuOpen(!menuOpen)}
->              <span className="hamburger hamburger-1"></span>              <span className="hamburger hamburger-2"></span>              <span className="hamburger hamburger-3"></span>            </button>            <div className="logo">              <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />              <div className="logo-text">                <strong>Panchakanya</strong>                <small>Electric Emporium</small>              </div>            </div>          </div>          <div className={
-`navbar-menu ${menuOpen ? 'active' : ''}`
-}
->            <a href="#home" onClick={
-() => setMenuOpen(false)}
->Home</a>            <a href="#brands" onClick={
-() => setMenuOpen(false)}
->Brands</a>            <a href="#categories" onClick={
-() => setMenuOpen(false)}
->Products</a>            <a href="#shop" onClick={
-() => setMenuOpen(false)}
->Shop</a>            <a href="#contact" onClick={
-() => setMenuOpen(false)}
->Contact</a>          </div>          <div className="navbar-actions">            <SearchBar               products={
+ aria-label="Toggle navigation menu" aria-expanded={menuOpen} aria-controls="navbar-mobile-panel">
+              <span className="hamburger hamburger-1"></span>              <span className="hamburger hamburger-2"></span>              <span className="hamburger hamburger-3"></span>          </button>
+          <div className="logo">
+            <img className="logo-icon-img" src={asset('/PPE.jpg')} alt="Panchakanya Electric Emporium" />
+            <div className="logo-text">
+              <strong>Panchakanya</strong>
+              <small>Electric Emporium</small>
+            </div>
+          </div>
+          <div className="navbar-search-center">
+            <SearchBar
+              products={
 products}
               getProductImage={
 getProductImage}
@@ -674,11 +651,166 @@ formatNPR}
               onShowAll={
 (q) => { setSearchTerm(q); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
 }
-            />            <a href={
+            />
+          </div>
+          <a href={
 `https://wa.me/${WHATSAPP_NUMBER}`
 }
- className="navbar-cta" target="_blank" rel="noreferrer">              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Zm0 18.15a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.78.81-2.98-.2-.31A8.15 8.15 0 1 1 12 20.15Zm4.47-6.11c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.77.95-.29.18-.53.06a6.68 6.68 0 0 1-3.37-2.94c-.25-.43.25-.4.72-1.33a.45.45 0 0 0-.02-.43c-.06-.12-.55-1.32-.75-1.81s-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.73 2.73 0 0 0-.86 2.05 4.75 4.75 0 0 0 1 2.52 10.78 10.78 0 0 0 4.13 3.67 14.13 14.13 0 0 0 1.38.51 3.3 3.3 0 0 0 1.52.1 2.47 2.47 0 0 0 1.62-1.15 2 2 0 0 0 .14-1.15c-.06-.11-.23-.18-.47-.3Z"/></svg> WhatsApp            </a>            <a href={asset('/item.html')} className="admin-link" title="Manage products (owner)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.49.49 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.42h-3.84a.48.48 0 0 0-.48.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.19 8.74a.49.49 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .61.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54c.05.23.25.42.48.42h3.84c.23 0 .43-.19.48-.42l.36-2.54a7.3 7.3 0 0 0 1.62-.94l2.39.96c.23.09.5 0 .61-.22l1.92-3.32a.49.49 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg> Admin</a>          </div>        </div>      </header>      <main className="store-main">        {
-/* HERO SECTION */}
+ className="navbar-cta" target="_blank" rel="noreferrer">              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.32A10 10 0 1 0 12 2Zm0 18.15a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.78.81-2.98-.2-.31A8.15 8.15 0 1 1 12 20.15Zm4.47-6.11c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.77.95-.29.18-.53.06a6.68 6.68 0 0 1-3.37-2.94c-.25-.43.25-.4.72-1.33a.45.45 0 0 0-.02-.43c-.06-.12-.55-1.32-.75-1.81s-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.73 2.73 0 0 0-.86 2.05 4.75 4.75 0 0 0 1 2.52 10.78 10.78 0 0 0 4.13 3.67 14.14 14.14 0 0 0 1.38.51 3.3 3.3 0 0 0 1.52.1 2.47 2.47 0 0 0 1.62-1.15 2 2 0 0 0 .14-1.15c-.06-.11-.23-.18-.47-.3Z"/></svg> WhatsApp          </a>
+          <a href={asset('/item.html')} className="admin-link" title="Manage products (owner)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.49.49 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.42h-3.84a.48.48 0 0 0-.48.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.19 8.74a.49.49 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .61.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54c.05.23.25.42.48.42h3.84c.23 0 .43-.19.48-.42l.36-2.54a7.3 7.3 0 0 0 1.62-.94l2.39.96c.23.09.5 0 .61-.22l1.92-3.32a.49.49 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg> Admin</a>
+        </div>
+        <nav className="navbar-row navbar-row-nav" aria-label="Main navigation">
+          <div className="navbar-cats navbar-main">
+            <div className="navbar-cat navbar-home">
+              <button className="navbar-cat-btn" onClick={
+() => { const el = document.getElementById('home'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+ aria-haspopup="true" aria-expanded="false">
+                <span className="navbar-cat-text">Home</span>
+                <svg className="navbar-cat-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div className="navbar-mega navbar-home-mega">
+                <div className="navbar-home-cols">
+                  {
+HOME_MENU.map((group) => (
+                    <div className="navbar-home-col" key={
+group.title}
+>
+                      <div className="navbar-home-col-title">{group.title}</div>
+                      <ul className="navbar-mega-list">
+                        {
+group.items.map((item) => (
+                          <li key={
+item.name}
+>
+                            <button onClick={
+() => { setSelectedCategory(item.filter); setMenuOpen(false); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+                              <span className="navbar-home-arrow" aria-hidden="true">&#8594;</span>
+                              <span>{item.name}</span>
+                            </button>
+                          </li>
+                        ))
+}
+                      </ul>
+                    </div>
+                  ))
+}
+                </div>
+              </div>
+            </div>
+            <button className="navbar-link" onClick={
+() => { const el = document.getElementById('brands'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z"/><circle cx="7.5" cy="7.5" r=".5"/></svg>
+              <span>Brands</span>
+            </button>
+            <button className="navbar-link" onClick={
+() => { const el = document.getElementById('categories'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/></svg>
+              <span>Products</span>
+            </button>
+            <button className="navbar-link" onClick={
+() => { const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span>Shop</span>
+            </button>
+            <button className="navbar-link" onClick={
+() => { const el = document.getElementById('contact'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+              <span>Contact</span>
+            </button>
+          </div>
+        </nav>
+      </header>
+      <div className={`navbar-overlay ${menuOpen ? 'open' : ''}`} onClick={
+() => setMenuOpen(false)}
+ aria-hidden="true"></div>
+      <aside className={`navbar-mobile ${menuOpen ? 'open' : ''}`} id="navbar-mobile-panel" aria-hidden={!menuOpen}>
+        <div className="navbar-mobile-head">
+          <span className="navbar-mobile-title">Menu</span>
+          <button className="navbar-mobile-close" onClick={
+() => setMenuOpen(false)}
+ aria-label="Close menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div className="navbar-mobile-inner">
+          <details className="navbar-mobile-cat navbar-mobile-home" open>
+            <summary>
+              <span>Home</span>
+              <svg className="navbar-mobile-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <ul className="navbar-mobile-list">
+              {
+HOME_MENU.map((group) => (
+                <li className="navbar-mobile-group" key={group.title}>
+                  <button className="navbar-mobile-group-title" onClick={
+() => { setSelectedCategory(group.group); setMenuOpen(false); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+                    <span>{group.title}</span>
+                  </button>
+                  <ul className="navbar-mobile-subs">
+                    {
+group.items.map((item) => (
+                      <li key={item.name}>
+                        <button onClick={
+() => { setSelectedCategory(item.filter); setMenuOpen(false); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+                          <span className="navbar-home-arrow" aria-hidden="true">&#8594;</span>
+                          <span>{item.name}</span>
+                        </button>
+                      </li>
+                    ))
+}
+                  </ul>
+                </li>
+              ))
+}
+            </ul>
+          </details>
+          <div className="navbar-mobile-links">
+            <button className="navbar-mobile-link" onClick={
+() => { setMenuOpen(false); const el = document.getElementById('brands'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z"/><circle cx="7.5" cy="7.5" r=".5"/></svg>
+              <span>Brands</span>
+            </button>
+            <button className="navbar-mobile-link" onClick={
+() => { setMenuOpen(false); const el = document.getElementById('categories'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/></svg>
+              <span>Products</span>
+            </button>
+            <button className="navbar-mobile-link" onClick={
+() => { setMenuOpen(false); const el = document.getElementById('shop'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span>Shop</span>
+            </button>
+            <button className="navbar-mobile-link" onClick={
+() => { setMenuOpen(false); const el = document.getElementById('contact'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }
+}
+>
+              <svg className="navbar-link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+              <span>Contact</span>
+            </button>
+          </div>
+          <a href={asset('/item.html')} className="admin-link navbar-mobile-admin" title="Manage products (owner)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.49.49 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.42h-3.84a.48.48 0 0 0-.48.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.19 8.74a.49.49 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .61.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54c.05.23.25.42.48.42h3.84c.23 0 .43-.19.48-.42l.36-2.54a7.3 7.3 0 0 0 1.62-.94l2.39.96c.23.09.5 0 .61-.22l1.92-3.32a.49.49 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg> Admin</a>
+        </div>
+      </aside>
+      <main className="store-main">
         <section id="home" className="hero">          <div className="container hero-container">            <div className="hero-content">              <span className="hero-eyebrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg> Trusted Electrical Emporium</span>              <h1>Power Your Home with <span className="text-gradient">Premium Electronics</span></h1>              <p>Premium fans, coolers, AC, appliances & electrical products from trusted brands — with honest prices and dependable after-sales support in Tandi, Chitwan.</p>              <div className="hero-buttons">                <button className="btn-primary" onClick={
 () => {
  document.getElementById('shop').scrollIntoView({
